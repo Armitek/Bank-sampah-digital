@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin - Bank Sampah Digital</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f4f7f4;
+            --surface: #ffffff;
+            --primary: #4a7c59;
+            --primary-hover: #3b6346;
+            --primary-light: #eaf2eb;
+            --accent: #88b04b;
+            --text-dark: #2c3e35;
+            --text-muted: #6c8075;
+            --border: #e1e8e3;
+            --radius: 20px;
+            --shadow: 0 15px 35px rgba(74, 124, 89, 0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, var(--surface) 0%, var(--primary-light) 100%);
+            padding: 25px 35px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 6px; height: 100%;
+            background: var(--primary);
+        }
+
+        .user-info h2 { font-size: 1.5rem; color: var(--text-dark); font-weight: 800; }
+        .user-info p { font-size: 0.9rem; color: var(--text-muted); margin-top: 4px; }
+
+        .badge-admin {
+            display: inline-block;
+            background: #b91c1c;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-left: 8px;
+        }
+
+        .btn-logout {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .btn-logout:hover { background: #fecaca; transform: translateY(-2px); }
+
+        /* Box KAS BANK bergaya kartu saldo user */
+        .kas-bank-box {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--primary-light) 100%);
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .kas-bank-box:hover {
+            transform: translateY(-2px);
+        }
+        .kas-bank-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .kas-bank-title-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .kas-bank-title-group h3 {
+            font-size: 1rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            font-weight: 800;
+        }
+        .kas-card-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--surface);
+            color: var(--primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            box-shadow: 0 4px 12px rgba(74, 124, 89, 0.08);
+        }
+        .btn-edit-kas {
+            background: var(--surface);
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+            padding: 9px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-edit-kas:hover {
+            background: var(--primary);
+            color: #ffffff;
+        }
+        .kas-saldo-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1.2;
+        }
+        .kas-bank-desc {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+        .kas-edit-form {
+            display: none;
+            margin-top: 18px;
+            padding-top: 18px;
+            border-top: 1px solid #d4e4d7;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .kas-edit-form.show {
+            display: flex;
+        }
+        .kas-edit-input {
+            flex: 1;
+            min-width: 210px;
+            padding: 11px 14px;
+            border: 1.5px solid var(--primary);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            background: var(--surface);
+        }
+        .btn-save-kas {
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 11px 18px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-save-kas:hover {
+            background: var(--primary-hover);
+        }
+        .btn-cancel-kas {
+            background: var(--surface);
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            padding: 11px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .admin-quick-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        @media (max-width: 720px) {
+            .admin-quick-grid { grid-template-columns: 1fr; }
+        }
+
+        .admin-quick-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 18px 22px;
+            box-shadow: var(--shadow);
+            text-decoration: none;
+            color: var(--text-dark);
+            transition: all 0.25s ease;
+            gap: 12px;
+        }
+        .admin-quick-box:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+            background: #f9fcf9;
+        }
+        .admin-quick-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .admin-quick-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+        .admin-quick-title {
+            font-size: 0.98rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+        .admin-quick-sub {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .admin-quick-cta {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.82rem;
+            padding: 8px 14px;
+            border-radius: 10px;
+            white-space: nowrap;
+        }
+
+        .card {
+            background: var(--surface);
+            padding: 35px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 25px;
+        }
+
+        .card h3 {
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: var(--text-dark); font-weight: 600; font-size: 0.9rem; }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            background: #fafcfb;
+            transition: all 0.3s ease;
+            color: var(--text-dark);
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(74, 124, 89, 0.1);
+            background: var(--surface);
+        }
+
+        .kategori-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .kategori-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fafcfb;
+            border: 1px solid var(--border);
+            padding: 15px 20px;
+            border-radius: 14px;
+            transition: all 0.2s ease;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .kategori-item:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .kategori-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            color: var(--text-dark);
+            cursor: pointer;
+            flex: 1;
+            min-width: 180px;
+        }
+        .kategori-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .kategori-harga {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .input-inputs {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .input-box-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .input-box-group label {
+            margin: 0;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .input-pcs {
+            width: 75px !important;
+            padding: 8px 10px !important;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .input-berat {
+            width: 95px !important;
+            padding: 8px 10px !important;
+            text-align: right;
+            font-weight: 700;
+        }
+
+        .unit-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .total-preview {
+            background: var(--primary-light);
+            padding: 18px 20px;
+            border-radius: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            border: 1px solid #d4e4d7;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .total-preview span:first-child { font-weight: 700; color: var(--text-dark); }
+        .total-preview span:last-child { font-size: 1.35rem; font-weight: 800; color: var(--primary); }
+
+        .btn-submit {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 8px 20px rgba(74, 124, 89, 0.25);
+            transition: all 0.3s ease;
+        }
+        .btn-submit:hover:not(:disabled) { background: var(--primary-hover); transform: translateY(-1px); }
+        .btn-submit:disabled { background: #a3b8a8; cursor: not-allowed; box-shadow: none; }
+
+        .alert-box {
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: none;
+            text-align: center;
+        }
+        .alert-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; display: block; }
+        .alert-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; display: block; }
+
+        /* Popup / Modal Konfirmasi Setoran */
+        .confirm-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(24, 36, 29, 0.45);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .confirm-backdrop.show {
+            display: flex;
+        }
+        .confirm-modal {
+            background: var(--surface);
+            border-radius: 22px;
+            max-width: 480px;
+            width: 100%;
+            padding: 28px;
+            box-shadow: 0 24px 50px rgba(0, 0, 0, 0.18);
+            border: 1px solid var(--border);
+        }
+        .confirm-modal h3 {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+        .confirm-sub {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+        .confirm-summary-list {
+            background: #fafcfb;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            max-height: 230px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .confirm-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.88rem;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #e1e8e3;
+        }
+        .confirm-item-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .confirm-total-row {
+            background: var(--primary-light);
+            border: 1px solid #d4e4d7;
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        .confirm-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        .btn-confirm-cancel {
+            background: #eef2ef;
+            color: var(--text-dark);
+            border: none;
+            padding: 11px 18px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .btn-confirm-ok {
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 11px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .btn-confirm-ok:hover:not(:disabled) {
+            background: var(--primary-hover);
+        }
+
+        footer {
+            margin-top: 50px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="user-info">
+            <h2 id="adminGreeting">Halo Admin!</h2>
+            <p>Kelola setoran sampah warga &amp; input saldo secara real-time <span class="badge-admin">ADMIN</span></p>
+        </div>
+        <button type="button" class="btn-logout" onclick="logoutAdmin()">Keluar 🚪</button>
+    </header>
+
+    <div class="kas-bank-box" id="kasBankCard">
+        <div class="kas-bank-top">
+            <div class="kas-bank-title-group">
+                <h3>Kas Bank Saat Ini</h3>
+                <div class="kas-card-icon">🏦</div>
+            </div>
+            <button type="button" class="btn-edit-kas" onclick="toggleEditKasBank()">✏️ Edit Kas Bank</button>
+        </div>
+        <div class="kas-saldo-value" id="kasBankAmount">Rp 0</div>
+        <p class="kas-bank-desc">Saldo kas bank yang tercatat pada akun admin di database.</p>
+
+        <div class="kas-edit-form" id="kasEditForm">
+            <input type="number" id="inputKasBankBaru" class="kas-edit-input" min="0" step="1" placeholder="Masukkan nominal Kas Bank (Rp)">
+            <button type="button" class="btn-save-kas" id="btnSimpanKas" onclick="saveKasBank()">Simpan Kas Bank</button>
+            <button type="button" class="btn-cancel-kas" onclick="toggleEditKasBank(false)">Batal</button>
+        </div>
+    </div>
+
+    <div class="admin-quick-grid">
+        <a href="admin_overview.html" class="admin-quick-box">
+            <div class="admin-quick-left">
+                <div class="admin-quick-icon">📊</div>
+                <div>
+                    <div class="admin-quick-title">Overview Admin</div>
+                    <div class="admin-quick-sub">Rekap setoran sampah, berat, &amp; aktivitas warga.</div>
+                </div>
+            </div>
+            <div class="admin-quick-cta">Buka →</div>
+        </a>
+
+        <a href="admin_redeem.html" class="admin-quick-box">
+            <div class="admin-quick-left">
+                <div class="admin-quick-icon">🎟️</div>
+                <div>
+                    <div class="admin-quick-title">Redeem Code</div>
+                    <div class="admin-quick-sub">Kelola &amp; proses penukaran kode cashout 12 digit.</div>
+                </div>
+            </div>
+            <div class="admin-quick-cta">Redeem →</div>
+        </a>
+    </div>
+
+    <div class="card">
+        <h3><span>📥</span> Input Setoran Sampah Nasabah</h3>
+
+        <form id="formSetoran" onsubmit="event.preventDefault(); showConfirmModal();">
+            <div class="form-group">
+                <label for="idUser">ID Anggota (Cukup masukkan angka, misal: 49823)</label>
+                <input type="text" id="idUser" required placeholder="Masukkan 5 digit ID Anggota" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+            </div>
+
+            <div class="form-group">
+                <label>Pilih Jenis Sampah, Jumlah Barang &amp; Total Kg</label>
+                <div id="kategoriContainer" class="kategori-list">
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Memuat daftar sampah...</p>
+                </div>
+            </div>
+
+            <div class="total-preview">
+                <span>Estimasi Total Pembayaran:</span>
+                <span id="estimasiTotal">Rp 0</span>
+            </div>
+
+            <button type="submit" id="btnSubmit" class="btn-submit">Simpan &amp; Tambahkan Saldo</button>
+        </form>
+
+        <div id="pesanRespon" class="alert-box"></div>
+    </div>
+</div>
+
+<!-- Popup Konfirmasi Setoran -->
+<div class="confirm-backdrop" id="confirmDepositModal">
+    <div class="confirm-modal">
+        <h3>Konfirmasi Setoran Sampah</h3>
+        <p class="confirm-sub" id="confirmAnggotaInfo">ID Anggota: -</p>
+        <div class="confirm-summary-list" id="confirmItemsList"></div>
+        <div class="confirm-total-row">
+            <span>Total Tambah Saldo</span>
+            <span id="confirmTotalBayar">Rp 0</span>
+        </div>
+        <div class="confirm-actions">
+            <button type="button" class="btn-confirm-cancel" onclick="closeConfirmModal()">Batal</button>
+            <button type="button" class="btn-confirm-ok" id="btnKonfirmasiProses" onclick="submitConfirmedDeposit()">Ya, Proses Setoran</button>
+        </div>
+    </div>
+</div>
+
+<footer>
+    " The Earth is what we all have in common. " - Wendbell Berry
+</footer>
+
+<script>
+    let kategoriData = [];
+    let redirectingAdminTarget = '';
+    let currentBoundAdminUser = '';
+    let currentKasBankValue = 0;
+    let pendingDepositPayload = null;
+
+    function redirectAdminTo(target) {
+        if (redirectingAdminTarget === target) return;
+        redirectingAdminTarget = target;
+        window.location.replace(target);
+    }
+
+    function clearAllSessionKeys() {
+        localStorage.removeItem('activeSessionUser');
+        localStorage.removeItem('activeSessionRole');
+        localStorage.removeItem('loggedUser');
+        localStorage.removeItem('loggedRole');
+        localStorage.removeItem('adminLoggedUser');
+        localStorage.removeItem('nasabahLoggedUser');
+
+        sessionStorage.removeItem('activeSessionUser');
+        sessionStorage.removeItem('activeSessionRole');
+        sessionStorage.removeItem('loggedUser');
+        sessionStorage.removeItem('loggedRole');
+        sessionStorage.removeItem('adminLoggedUser');
+        sessionStorage.removeItem('nasabahLoggedUser');
+    }
+
+    function resolveAdminUsername() {
+        const sessionAdmin = (sessionStorage.getItem('adminLoggedUser') || '').trim();
+        if (sessionAdmin) return sessionAdmin;
+
+        const activeUser = (localStorage.getItem('activeSessionUser') || '').trim();
+        const activeRole = (localStorage.getItem('activeSessionRole') || '').trim().toUpperCase();
+        if (activeUser && (!activeRole || activeRole === 'ADMIN')) {
+            return activeUser;
+        }
+
+        const loggedUser = (localStorage.getItem('loggedUser') || '').trim();
+        const loggedRole = (localStorage.getItem('loggedRole') || '').trim().toUpperCase();
+        if (loggedUser && (!loggedRole || loggedRole === 'ADMIN')) {
+            return loggedUser;
+        }
+
+        return (localStorage.getItem('adminLoggedUser') || '').trim();
+    }
+
+    function logoutAdmin() {
+        clearAllSessionKeys();
+        redirectAdminTo('login.html');
+    }
+
+    function formatRupiah(num) {
+        const val = Number(num || 0);
+        const sign = val < 0 ? "-" : "";
+        return sign + "Rp " + Math.abs(val).toLocaleString("id-ID");
+    }
+
+    function escapeHtml(str) {
+        return String(str || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
+    }
+
+    function renderKasBankValue(val) {
+        currentKasBankValue = Number(val || 0);
+        const amountEl = document.getElementById('kasBankAmount');
+        if (amountEl) {
+            amountEl.textContent = formatRupiah(currentKasBankValue);
+        }
+    }
+
+    async function loadKasBank() {
+        const adminUser = (currentBoundAdminUser || resolveAdminUsername() || '').trim();
+        if (!adminUser) return;
+
+        try {
+            const res = await fetch(`get_user.php?username=${encodeURIComponent(adminUser)}&_t=${Date.now()}`);
+            const data = await res.json();
+            if (data.status === 'success' && data.user) {
+                renderKasBankValue(data.user.saldo);
+            }
+        } catch (err) {
+            console.error("Gagal memuat saldo Kas Bank:", err);
+        }
+    }
+
+    function toggleEditKasBank(forceState) {
+        const formEl = document.getElementById('kasEditForm');
+        const inputEl = document.getElementById('inputKasBankBaru');
+        if (!formEl || !inputEl) return;
+
+        const shouldShow = typeof forceState === 'boolean' ? forceState : !formEl.classList.contains('show');
+        if (shouldShow) {
+            inputEl.value = String(currentKasBankValue);
+            formEl.classList.add('show');
+            inputEl.focus();
+        } else {
+            formEl.classList.remove('show');
+        }
+    }
+
+    async function saveKasBank() {
+        const adminUser = (currentBoundAdminUser || resolveAdminUsername() || '').trim();
+        const inputEl = document.getElementById('inputKasBankBaru');
+        const btnSimpan = document.getElementById('btnSimpanKas');
+        const pesanBox = document.getElementById('pesanRespon');
+        if (!adminUser || !inputEl || !btnSimpan) return;
+
+        const nextSaldo = Number(inputEl.value);
+        if (Number.isNaN(nextSaldo) || nextSaldo < 0) {
+            pesanBox.textContent = "Masukkan nominal Kas Bank yang valid (minimal 0).";
+            pesanBox.className = "alert-box alert-error";
+            return;
+        }
+
+        btnSimpan.disabled = true;
+        btnSimpan.textContent = "Menyimpan...";
+
+        try {
+            const res = await fetch('update_kas_bank.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: adminUser,
+                    saldo: nextSaldo
+                })
+            });
+
+            const data = await res.json();
+            if (res.ok && data.status === 'success') {
+                renderKasBankValue(data.saldo ?? nextSaldo);
+                toggleEditKasBank(false);
+                pesanBox.textContent = `Kas Bank diperbarui menjadi ${formatRupiah(data.saldo ?? nextSaldo)}.`;
+                pesanBox.className = "alert-box alert-success";
+            } else {
+                pesanBox.textContent = data.message || "Gagal memperbarui Kas Bank.";
+                pesanBox.className = "alert-box alert-error";
+            }
+        } catch (err) {
+            console.error(err);
+            pesanBox.textContent = "Terjadi kesalahan koneksi saat memperbarui Kas Bank.";
+            pesanBox.className = "alert-box alert-error";
+        } finally {
+            btnSimpan.disabled = false;
+            btnSimpan.textContent = "Simpan Kas Bank";
+        }
+    }
+
+    async function cekAdminAuth() {
+        const adminUser = resolveAdminUsername();
+        if (!adminUser) {
+            clearAllSessionKeys();
+            redirectAdminTo('login.html');
+            return false;
+        }
+
+        try {
+            const res = await fetch(`get_user.php?username=${encodeURIComponent(adminUser)}&_t=${Date.now()}`);
+            const data = await res.json();
+
+            if (data.status !== 'success' || !data.user) {
+                logoutAdmin();
+                return false;
+            }
+
+            const role = String(data.user.role || '').toUpperCase();
+            if (role !== 'ADMIN') {
+                alert("Akses ditolak: Akun ini bukan ADMIN.");
+                redirectAdminTo('dashboard.html');
+                return false;
+            }
+
+            currentBoundAdminUser = adminUser;
+            localStorage.setItem('activeSessionUser', adminUser);
+            localStorage.setItem('activeSessionRole', 'ADMIN');
+            localStorage.setItem('loggedUser', adminUser);
+            localStorage.setItem('loggedRole', 'ADMIN');
+            localStorage.setItem('adminLoggedUser', adminUser);
+            sessionStorage.setItem('adminLoggedUser', adminUser);
+
+            document.getElementById('adminGreeting').textContent = `Halo ${data.user.nama || 'Admin'}!`;
+            renderKasBankValue(data.user.saldo);
+            return true;
+        } catch (err) {
+            console.error("Gagal memverifikasi sesi admin:", err);
+            return true;
+        }
+    }
+
+    function handleCrossTabSessionChange() {
+        const activeUser = (localStorage.getItem('activeSessionUser') || '').trim();
+        const loggedUser = (localStorage.getItem('loggedUser') || '').trim();
+        const latestUser = activeUser || loggedUser || (localStorage.getItem('adminLoggedUser') || '').trim();
+
+        if (!latestUser) {
+            clearAllSessionKeys();
+            redirectAdminTo('login.html');
+            return;
+        }
+
+        if (currentBoundAdminUser && latestUser !== currentBoundAdminUser) {
+            cekAdminAuth();
+        }
+    }
+
+    window.addEventListener('storage', function(e) {
+        if (
+            e.key === 'activeSessionUser' ||
+            e.key === 'activeSessionRole' ||
+            e.key === 'loggedUser' ||
+            e.key === 'loggedRole' ||
+            e.key === 'adminLoggedUser' ||
+            e.key === 'nasabahLoggedUser'
+        ) {
+            handleCrossTabSessionChange();
+        }
+    });
+
+    window.addEventListener('focus', handleCrossTabSessionChange);
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) handleCrossTabSessionChange();
+    });
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            redirectingAdminTarget = '';
+        }
+        handleCrossTabSessionChange();
+    });
+
+    async function loadKategori() {
+        try {
+            const res = await fetch(`get_kategori.php?_t=${Date.now()}`);
+            const data = await res.json();
+
+            if (data.status === 'success' && Array.isArray(data.kategori)) {
+                kategoriData = data.kategori.filter((item) => {
+                    const kode = String(item.kode_sampah || '').trim().toUpperCase();
+                    const nama = String(item.nama_jenis || '').trim().toUpperCase();
+                    return kode !== 'RDM-CASH' && !kode.startsWith('RDM-') && !nama.includes('REDEEM VOUCHER');
+                });
+                renderKategoriList();
+            } else {
+                document.getElementById('kategoriContainer').innerHTML = `<p style="color: #b91c1c;">Gagal memuat data sampah.</p>`;
+            }
+        } catch (err) {
+            console.error(err);
+            document.getElementById('kategoriContainer').innerHTML = `<p style="color: #b91c1c;">Error koneksi ke server.</p>`;
+        }
+    }
+
+    function renderKategoriList() {
+        const container = document.getElementById('kategoriContainer');
+        container.innerHTML = '';
+
+        kategoriData.forEach((item, index) => {
+            const harga = parseFloat(item.harga_per_kg);
+            const div = document.createElement('div');
+            div.className = 'kategori-item';
+            div.innerHTML = `
+                <label class="kategori-checkbox" for="chk_${index}">
+                    <input type="checkbox" id="chk_${index}" class="item-check" data-kode="${item.kode_sampah}" data-harga="${harga}" data-nama="${escapeHtml(item.nama_jenis)}" onchange="hitungEstimasi()">
+                    <div>
+                        <div>${escapeHtml(item.nama_jenis)}</div>
+                        <div class="kategori-harga">Rp ${harga.toLocaleString('id-ID')} / Kg</div>
+                    </div>
+                </label>
+                <div class="input-inputs">
+                    <div class="input-box-group">
+                        <label for="pcs_${index}">Jumlah Barang</label>
+                        <input type="number" id="pcs_${index}" class="input-pcs" min="1" step="1" value="1" oninput="hitungEstimasi()">
+                        <span class="unit-label">pcs</span>
+                    </div>
+                    <div class="input-box-group">
+                        <label for="berat_${index}">Total Kg</label>
+                        <input type="number" id="berat_${index}" class="input-berat" min="0.01" step="0.01" placeholder="0" oninput="hitungEstimasi()">
+                        <span class="unit-label">Kg</span>
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function hitungEstimasi() {
+        let total = 0;
+        const checkboxes = document.querySelectorAll('.item-check');
+
+        checkboxes.forEach((chk, index) => {
+            const pcsInput = document.getElementById(`pcs_${index}`);
+            const beratInput = document.getElementById(`berat_${index}`);
+            const pcsVal = parseInt(pcsInput.value) || 0;
+            const beratVal = parseFloat(beratInput.value) || 0;
+            const harga = parseFloat(chk.getAttribute('data-harga')) || 0;
+
+            if (beratVal > 0 && !chk.checked) {
+                chk.checked = true;
+            }
+
+            if (chk.checked) {
+                if (pcsVal < 1) pcsInput.value = 1;
+                if (beratVal > 0) {
+                    total += beratVal * harga;
+                }
+            }
+        });
+
+        document.getElementById('estimasiTotal').textContent = formatRupiah(total);
+    }
+
+    function showConfirmModal() {
+        const idUser = document.getElementById('idUser').value.trim();
+        const pesanBox = document.getElementById('pesanRespon');
+        pesanBox.className = "alert-box";
+
+        if (!idUser) {
+            pesanBox.textContent = "Harap masukkan ID Anggota!";
+            pesanBox.className = "alert-box alert-error";
+            return;
+        }
+
+        const items = [];
+        const summaryRows = [];
+        let totalBayar = 0;
+        const checkboxes = document.querySelectorAll('.item-check');
+
+        checkboxes.forEach((chk, index) => {
+            if (chk.checked) {
+                const kodeSampah = chk.getAttribute('data-kode');
+                const namaJenis = chk.getAttribute('data-nama') || kodeSampah;
+                const hargaPerKg = parseFloat(chk.getAttribute('data-harga')) || 0;
+                const jumlahBarang = parseInt(document.getElementById(`pcs_${index}`).value) || 1;
+                const beratKg = parseFloat(document.getElementById(`berat_${index}`).value) || 0;
+
+                if (beratKg > 0) {
+                    const subtotal = beratKg * hargaPerKg;
+                    totalBayar += subtotal;
+                    items.push({
+                        kode_sampah: kodeSampah,
+                        jumlah_barang: jumlahBarang,
+                        berat_kg: beratKg
+                    });
+                    summaryRows.push(`
+                        <div class="confirm-item-row">
+                            <div>
+                                <strong>${escapeHtml(namaJenis)}</strong><br>
+                                <span style="color: var(--text-muted); font-size: 0.8rem;">${jumlahBarang} pcs • ${beratKg} Kg</span>
+                            </div>
+                            <strong style="color: var(--primary);">${formatRupiah(subtotal)}</strong>
+                        </div>
+                    `);
+                }
+            }
+        });
+
+        if (items.length === 0) {
+            pesanBox.textContent = "Pilih minimal satu jenis sampah dan masukkan berat (> 0 Kg)!";
+            pesanBox.className = "alert-box alert-error";
+            return;
+        }
+
+        pendingDepositPayload = { id_user: idUser, items: items };
+        document.getElementById('confirmAnggotaInfo').textContent = `ID Anggota: ${idUser}`;
+        document.getElementById('confirmItemsList').innerHTML = summaryRows.join('');
+        document.getElementById('confirmTotalBayar').textContent = formatRupiah(totalBayar);
+        document.getElementById('confirmDepositModal').classList.add('show');
+    }
+
+    function closeConfirmModal() {
+        document.getElementById('confirmDepositModal').classList.remove('show');
+        pendingDepositPayload = null;
+    }
+
+    async function submitConfirmedDeposit() {
+        if (!pendingDepositPayload) return;
+
+        const payload = pendingDepositPayload;
+        const pesanBox = document.getElementById('pesanRespon');
+        const btnSubmit = document.getElementById('btnSubmit');
+        const btnConfirm = document.getElementById('btnKonfirmasiProses');
+
+        btnSubmit.disabled = true;
+        btnSubmit.textContent = "Memproses...";
+        btnConfirm.disabled = true;
+        btnConfirm.textContent = "Memproses...";
+        pesanBox.className = "alert-box";
+
+        try {
+            const res = await fetch('proses_transaksi.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+            closeConfirmModal();
+
+            if (res.ok && data.status === 'success') {
+                pesanBox.innerHTML = `${escapeHtml(data.message)}<br>Saldo baru anggota: <strong>${formatRupiah(data.saldo_baru)}</strong>`;
+                pesanBox.className = "alert-box alert-success";
+
+                document.getElementById('formSetoran').reset();
+                document.getElementById('estimasiTotal').textContent = "Rp 0";
+                await loadKasBank();
+            } else {
+                pesanBox.textContent = data.message || "Gagal memproses setoran.";
+                pesanBox.className = "alert-box alert-error";
+            }
+        } catch (err) {
+            console.error(err);
+            closeConfirmModal();
+            pesanBox.textContent = "Terjadi kesalahan koneksi ke server.";
+            pesanBox.className = "alert-box alert-error";
+        } finally {
+            btnSubmit.disabled = false;
+            btnSubmit.textContent = "Simpan & Tambahkan Saldo";
+            btnConfirm.disabled = false;
+            btnConfirm.textContent = "Ya, Proses Setoran";
+        }
+    }
+
+    (async function initAdminDashboard() {
+        const ok = await cekAdminAuth();
+        if (ok) {
+            await loadKasBank();
+            await loadKategori();
+        }
+    })();
+</script>
+
+</body>
+</html>

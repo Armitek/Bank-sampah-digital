@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transfer Saldo Sampah - Admin Bank Sampah Digital</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f4f7f4;
+            --surface: #ffffff;
+            --primary: #4a7c59;
+            --primary-hover: #3b6346;
+            --primary-light: #eaf2eb;
+            --text-dark: #2c3e35;
+            --text-muted: #6c8075;
+            --border: #e1e8e3;
+            --radius: 20px;
+            --shadow: 0 15px 35px rgba(74, 124, 89, 0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px 20px;
+        }
+
+        .container { width: 100%; max-width: 950px; margin: 0 auto; }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, var(--surface) 0%, var(--primary-light) 100%);
+            padding: 24px 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 6px; height: 100%;
+            background: var(--primary);
+        }
+
+        .user-info h2 { font-size: 1.45rem; font-weight: 800; color: var(--text-dark); }
+        .user-info p { font-size: 0.88rem; color: var(--text-muted); margin-top: 4px; }
+
+        .nav-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn-nav {
+            text-decoration: none;
+            background: var(--surface);
+            color: var(--text-dark);
+            border: 1px solid var(--border);
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.86rem;
+            transition: all 0.2s ease;
+        }
+        .btn-nav:hover { border-color: var(--primary); background: var(--primary-light); }
+
+        .card {
+            background: var(--surface);
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+        .card h3 { font-size: 1.2rem; color: var(--text-dark); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+
+        .form-group { margin-bottom: 16px; }
+        label { display: block; margin-bottom: 6px; color: var(--text-dark); font-weight: 600; font-size: 0.9rem; }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            background: #fafcfb;
+            color: var(--text-dark);
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(74, 124, 89, 0.1);
+            background: #ffffff;
+        }
+
+        .sampah-item-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            background: var(--bg-main);
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .sampah-info { display: flex; align-items: center; gap: 12px; min-width: 200px; flex: 1; }
+        .sampah-info input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--primary); cursor: pointer; }
+
+        .inputs-group { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+        .field-box { display: flex; flex-direction: column; gap: 4px; }
+        .field-box span.mini-label {
+            font-size: 0.72rem; font-weight: 700; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.4px;
+        }
+
+        .berat-input-wrap { display: flex; align-items: center; gap: 6px; }
+        .berat-input-wrap input {
+            width: 95px; padding: 8px 10px; border: 1px solid var(--border);
+            border-radius: 8px; text-align: right; font-weight: 700;
+            background: #ffffff; color: var(--text-dark);
+        }
+
+        .total-preview {
+            background: var(--primary-light);
+            padding: 16px 20px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            font-weight: 700;
+        }
+
+        .btn-submit {
+            display: block;
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(74, 124, 89, 0.25);
+            transition: all 0.3s ease;
+            margin-top: 24px;
+        }
+        .btn-submit:hover { background: var(--primary-hover); }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); display: none;
+            justify-content: center; align-items: center; z-index: 999; padding: 20px;
+        }
+        .modal-card {
+            background: var(--surface); padding: 30px; border-radius: var(--radius);
+            width: 100%; max-width: 450px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); text-align: center;
+        }
+        .modal-buttons { display: flex; gap: 12px; margin-top: 20px; }
+        .btn-modal-cancel { flex: 1; background: #e2e8f0; color: #475569; border: none; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+        .btn-modal-confirm { flex: 1; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+
+        footer { margin-top: 40px; color: var(--text-muted); font-size: 0.85rem; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="user-info">
+            <h2>💸 Transfer / Setoran Saldo Nasabah</h2>
+            <p>Input setoran sampah warga untuk menambah saldo nasabah secara terstruktur</p>
+        </div>
+        <div class="nav-actions">
+            <a href="admin_dashboard.html" class="btn-nav">← Kembali ke Panel Admin</a>
+            <a href="admin_overview.html" class="btn-nav">📊 Overview Admin</a>
+        </div>
+    </header>
+
+    <div class="card">
+        <h3><span>📝</span> Form Transfer Saldo Setoran Sampah</h3>
+
+        <form id="formSetoran" onsubmit="event.preventDefault(); showConfirmModal();">
+            <div class="form-group">
+                <label for="idUserNasabah">ID Anggota (Cukup masukkan angka, misal: 49823)</label>
+                <input type="text" id="idUserNasabah" required placeholder="Masukkan 5 digit ID Anggota">
+            </div>
+
+            <label style="margin-top: 20px; margin-bottom: 10px;">Pilih Jenis Sampah, Jumlah Barang &amp; Total Kg</label>
+
+            <div id="listKategoriContainer">
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Memuat daftar kategori sampah...</p>
+            </div>
+
+            <div class="total-preview">
+                <span>Estimasi Total Transfer Saldo:</span>
+                <span id="labelTotalEstimasi" style="font-size: 1.3rem; color: var(--primary);">Rp 0</span>
+            </div>
+
+            <button type="submit" class="btn-submit">PROSES TRANSFER SALDO SETORAN →</button>
+        </form>
+    </div>
+</div>
+
+<div id="confirmModal" class="modal-overlay">
+    <div class="modal-card">
+        <h3 style="color: var(--primary); margin-bottom: 10px;">Konfirmasi Transfer Saldo</h3>
+        <p id="modalTextSummary" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; margin-bottom: 15px;"></p>
+        <div class="modal-buttons">
+            <button type="button" class="btn-modal-cancel" onclick="closeConfirmModal()">Batal</button>
+            <button type="button" class="btn-modal-confirm" onclick="executeSetoran()">Ya, Transfer Sekarang</button>
+        </div>
+    </div>
+</div>
+
+<footer>
+    " The Earth is what we all have in common. " - Wendbell Berry
+</footer>
+
+<script>
+    let kategoriList = [];
+
+    async function loadKategoriSampah() {
+        try {
+            const res = await fetch('get_kategori.php');
+            const data = await res.json();
+            if (data.status === 'success') {
+                kategoriList = (data.kategori || []).filter(k => String(k.kode_sampah || '').toUpperCase() !== 'RDM-CASH');
+                renderKategoriUI();
+            }
+        } catch (err) {
+            console.error("Gagal memuat kategori sampah", err);
+        }
+    }
+
+    function renderKategoriUI() {
+        const container = document.getElementById('listKategoriContainer');
+        container.innerHTML = '';
+
+        kategoriList.forEach(kat => {
+            container.innerHTML += `
+                <div class="sampah-item-box">
+                    <div class="sampah-info">
+                        <input type="checkbox" id="chk_${kat.kode_sampah}" onchange="hitungTotal()">
+                        <div>
+                            <strong>${kat.nama_jenis}</strong>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">Rp ${Number(kat.harga_per_kg).toLocaleString('id-ID')} / Kg</div>
+                        </div>
+                    </div>
+                    <div class="inputs-group">
+                        <div class="field-box">
+                            <span class="mini-label">Jumlah Barang</span>
+                            <div class="berat-input-wrap">
+                                <input type="number" step="1" min="1" id="jml_${kat.kode_sampah}" value="1" oninput="hitungTotal()">
+                                <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">pcs</span>
+                            </div>
+                        </div>
+                        <div class="field-box">
+                            <span class="mini-label">Total Kg</span>
+                            <div class="berat-input-wrap">
+                                <input type="number" step="0.1" min="0" id="berat_${kat.kode_sampah}" placeholder="0" oninput="hitungTotal()">
+                                <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted);">Kg</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function hitungTotal() {
+        let total = 0;
+        kategoriList.forEach(kat => {
+            const chk = document.getElementById(`chk_${kat.kode_sampah}`);
+            const inputBerat = document.getElementById(`berat_${kat.kode_sampah}`);
+            if (chk && chk.checked) {
+                const berat = parseFloat(inputBerat.value) || 0;
+                total += berat * parseFloat(kat.harga_per_kg);
+            }
+        });
+        document.getElementById('labelTotalEstimasi').textContent = `Rp ${total.toLocaleString('id-ID')}`;
+    }
+
+    function showConfirmModal() {
+        const id_user = document.getElementById('idUserNasabah').value.trim();
+        let total = 0, totalBarang = 0, totalKg = 0;
+
+        kategoriList.forEach(kat => {
+            const chk = document.getElementById(`chk_${kat.kode_sampah}`);
+            const inputBerat = document.getElementById(`berat_${kat.kode_sampah}`);
+            const inputJml = document.getElementById(`jml_${kat.kode_sampah}`);
+            if (chk && chk.checked) {
+                const berat = parseFloat(inputBerat.value) || 0;
+                const jml = parseInt(inputJml.value, 10) || 1;
+                if (berat > 0) {
+                    total += berat * parseFloat(kat.harga_per_kg);
+                    totalBarang += jml;
+                    totalKg += berat;
+                }
+            }
+        });
+
+        if (total <= 0) {
+            alert("Harap pilih minimal satu jenis sampah dan masukkan Total Kg-nya!");
+            return;
+        }
+
+        document.getElementById('modalTextSummary').innerHTML = `
+            ID Anggota: <b>${id_user}</b><br>
+            Total Barang: <b>${totalBarang} pcs</b> • Total Berat: <b>${totalKg} Kg</b><br>
+            Total Transfer Saldo: <b>Rp ${total.toLocaleString('id-ID')}</b>
+        `;
+        document.getElementById('confirmModal').style.display = 'flex';
+    }
+
+    function closeConfirmModal() {
+        document.getElementById('confirmModal').style.display = 'none';
+    }
+
+    async function executeSetoran() {
+        const id_user = document.getElementById('idUserNasabah').value.trim();
+        let items = [];
+
+        kategoriList.forEach(kat => {
+            const chk = document.getElementById(`chk_${kat.kode_sampah}`);
+            const inputBerat = document.getElementById(`berat_${kat.kode_sampah}`);
+            const inputJml = document.getElementById(`jml_${kat.kode_sampah}`);
+            if (chk && chk.checked) {
+                const berat = parseFloat(inputBerat.value) || 0;
+                const jumlah_barang = parseInt(inputJml.value, 10) || 1;
+                if (berat > 0) {
+                    items.push({ kode_sampah: kat.kode_sampah, jumlah_barang, berat_kg: berat });
+                }
+            }
+        });
+
+        try {
+            const res = await fetch('proses_transaksi.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id_user, items })
+            });
+            const data = await res.json();
+            if (res.ok && data.status === 'success') {
+                alert(data.message);
+                window.location.reload();
+            } else {
+                alert("Gagal: " + (data.message || 'Terjadi kesalahan'));
+                closeConfirmModal();
+            }
+        } catch (err) {
+            alert("Gagal terhubung ke server!");
+            closeConfirmModal();
+        }
+    }
+
+    loadKategoriSampah();
+</script>
+
+</body>
+</html>

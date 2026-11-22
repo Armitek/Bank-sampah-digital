@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overview Setoran Sampah — Bank Sampah Digital</title>
+  <style>
+    :root {
+      --bg: #f4f7f5;
+      --card: #ffffff;
+      --primary: #1b5e3a;
+      --primary-soft: #e6f2ec;
+      --text: #16221b;
+      --muted: #5c6e64;
+      --border: #dce6e0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .back-btn {
+      text-decoration: none;
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .user-pill {
+      background: var(--primary-soft);
+      color: var(--primary);
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+
+    .period-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .period-btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 10px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text);
+      transition: 0.15s ease;
+    }
+
+    .period-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .summary-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .summary-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .summary-value {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .summary-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .panel-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .jenis-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .jenis-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fafcfb;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .jenis-name {
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .jenis-meta {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .jenis-right {
+      text-align: right;
+    }
+
+    .jenis-pcs {
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 13px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .jenis-uang {
+      font-weight: 700;
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 28px 14px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 640px) {
+      .period-tabs { grid-template-columns: repeat(2, 1fr); }
+      .summary-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top-bar">
+      <a href="dashboard.html" class="back-btn" id="backLink">← Kembali ke Dashboard</a>
+      <span class="user-pill" id="userBadge">ID Anggota: -</span>
+    </div>
+
+    <h1>Overview Setoran Sampah</h1>
+    <p class="subtitle" id="periodSubtitle">Ringkasan kontribusi sampah dan pendapatan saldo kamu</p>
+
+    <div class="period-tabs">
+      <button class="period-btn" data-range="3d" onclick="selectRange('3d')">3 Hari</button>
+      <button class="period-btn" data-range="7d" onclick="selectRange('7d')">7 Hari</button>
+      <button class="period-btn active" data-range="30d" onclick="selectRange('30d')">Sebulan (30 Hari)</button>
+      <button class="period-btn" data-range="all" onclick="selectRange('all')">Lifetime</button>
+    </div>
+
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-label">Total Berat Sampah</div>
+        <div class="summary-value" id="totalBerat">0 Kg</div>
+        <div class="summary-sub" id="totalPcsInfo">0 pcs disetor</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Total Uang </div>
+        <div class="summary-value" id="totalUang">Rp 0</div>
+        <div class="summary-sub">Akumulasi saldo periode ini</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Jenis Sampah</div>
+        <div class="summary-value" id="totalJenis">0 Jenis</div>
+        <div class="summary-sub">Tercatat pada periode ini</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Rincian Transaksi</div>
+      <div class="jenis-list" id="jenisList">
+        <div class="empty-state">Memuat data overview...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    if (window.location.search) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    const PERIOD_LABELS = {
+      "3d":  "Overview 3 Hari Terakhir",
+      "7d":  "Overview 7 Hari Terakhir",
+      "30d": "Overview Sebulan (30 Hari Terakhir)",
+      "all": "Overview Lifetime (Seluruh Riwayat)"
+    };
+
+    let overviewData = null;
+    let activeRange = "30d";
+    let redirectingOverviewTarget = "";
+    let currentBoundUser = "";
+    let currentBoundIdUser = "";
+
+    function redirectOverviewTo(target) {
+      if (redirectingOverviewTarget === target) return;
+      redirectingOverviewTarget = target;
+      document.body.style.display = "none";
+      window.location.replace(target);
+    }
+
+    function clearOverviewSessionKeys() {
+      localStorage.removeItem("activeSessionUser");
+      localStorage.removeItem("activeSessionRole");
+      localStorage.removeItem("loggedUser");
+      localStorage.removeItem("loggedRole");
+      localStorage.removeItem("nasabahLoggedUser");
+      localStorage.removeItem("adminLoggedUser");
+      localStorage.removeItem("id_user");
+      localStorage.removeItem("id_user_owner");
+
+      sessionStorage.removeItem("activeSessionUser");
+      sessionStorage.removeItem("activeSessionRole");
+      sessionStorage.removeItem("loggedUser");
+      sessionStorage.removeItem("loggedRole");
+      sessionStorage.removeItem("nasabahLoggedUser");
+      sessionStorage.removeItem("adminLoggedUser");
+      sessionStorage.removeItem("id_user");
+    }
+
+    function getOverviewActiveSession() {
+      const user = (
+        localStorage.getItem("activeSessionUser") ||
+        localStorage.getItem("loggedUser") ||
+        ""
+      ).trim();
+      const role = (
+        localStorage.getItem("activeSessionRole") ||
+        localStorage.getItem("loggedRole") ||
+        "NASABAH"
+      ).trim().toUpperCase();
+      return { user, role };
+    }
+
+    function enforceOverviewSession() {
+      const { user, role } = getOverviewActiveSession();
+      if (!user) {
+        clearOverviewSessionKeys();
+        redirectOverviewTo("login.html");
+        return null;
+      }
+      if (role === "ADMIN") {
+        redirectOverviewTo("admin_dashboard.html");
+        return null;
+      }
+      if (currentBoundUser && user !== currentBoundUser) {
+        window.location.reload();
+        return null;
+      }
+      return { user, role };
+    }
+
+    const SESSION_KEYS = new Set([
+      "activeSessionUser",
+      "activeSessionRole",
+      "loggedUser",
+      "loggedRole",
+      "nasabahLoggedUser",
+      "adminLoggedUser"
+    ]);
+
+    window.addEventListener("storage", function(e) {
+      if (e.key === null || SESSION_KEYS.has(e.key)) {
+        enforceOverviewSession();
+      }
+    });
+
+    window.addEventListener("focus", function() {
+      enforceOverviewSession();
+    });
+
+    document.addEventListener("visibilitychange", function() {
+      if (!document.hidden) {
+        enforceOverviewSession();
+      }
+    });
+
+    window.addEventListener("pageshow", function(event) {
+      if (event.persisted) {
+        redirectingOverviewTarget = "";
+        document.body.style.display = "";
+      }
+      const sess = enforceOverviewSession();
+      if (sess && event.persisted) {
+        initOverview();
+      }
+    });
+
+    setInterval(function() {
+      if (!redirectingOverviewTarget) {
+        enforceOverviewSession();
+      }
+    }, 600);
+
+    function formatRupiah(num) {
+      return "Rp " + Number(num || 0).toLocaleString("id-ID");
+    }
+
+    function formatKg(val) {
+      const n = Number(val || 0);
+      return (Number.isInteger(n) ? n : n.toFixed(2).replace(/\.?0+$/, "")) + " Kg";
+    }
+
+    function selectRange(range) {
+      if (!enforceOverviewSession()) return;
+      activeRange = range;
+      document.querySelectorAll(".period-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.range === range);
+      });
+      renderPeriod();
+    }
+
+    function renderPeriod() {
+      if (!enforceOverviewSession()) return;
+
+      const subtitleEl = document.getElementById("periodSubtitle");
+      subtitleEl.textContent = PERIOD_LABELS[activeRange] || "Overview Setoran";
+
+      if (!overviewData || !overviewData[activeRange]) return;
+
+      const data = overviewData[activeRange];
+      const perJenis = Array.isArray(data.per_jenis) ? data.per_jenis : [];
+
+      document.getElementById("totalBerat").textContent = formatKg(data.total_berat);
+      document.getElementById("totalPcsInfo").textContent = `${Number(data.total_pcs || 0).toLocaleString("id-ID")} pcs disetor`;
+      document.getElementById("totalUang").textContent = formatRupiah(data.total_uang);
+      document.getElementById("totalJenis").textContent = `${perJenis.length} Jenis`;
+
+      const listEl = document.getElementById("jenisList");
+      if (perJenis.length === 0) {
+        listEl.innerHTML = `<div class="empty-state">Belum ada setoran sampah pada periode ini.</div>`;
+        return;
+      }
+
+      listEl.innerHTML = perJenis.map((item) => `
+        <div class="jenis-row">
+          <div>
+            <div class="jenis-name">${escapeHtml(item.nama_jenis)}</div>
+            <div class="jenis-meta">Berat: ${formatKg(item.berat_kg)} • Kode: ${escapeHtml(item.kode_sampah)}</div>
+          </div>
+          <div class="jenis-right">
+            <span class="jenis-pcs">${Number(item.jumlah_barang || 0).toLocaleString("id-ID")} pcs</span>
+            <div class="jenis-uang">${formatRupiah(item.total_harga)}</div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    async function resolveIdUserForActiveSession(activeUser) {
+      const cachedUser = (localStorage.getItem("id_user_owner") || "").trim();
+      const cachedId = (
+        localStorage.getItem("id_user") ||
+        sessionStorage.getItem("id_user") ||
+        ""
+      ).trim();
+
+      if (cachedUser && cachedUser === activeUser && cachedId) {
+        return { idUser: cachedId, role: "NASABAH" };
+      }
+
+      const res = await fetch(`get_user.php?username=${encodeURIComponent(activeUser)}&_t=${Date.now()}`);
+      if (!enforceOverviewSession()) return null;
+
+      const data = await res.json();
+      if (!enforceOverviewSession()) return null;
+
+      if (data.status !== "success" || !data.user) {
+        return null;
+      }
+
+      const role = String(data.user.role || "NASABAH").toUpperCase();
+      const idUser = String(data.user.id_user || "").trim();
+      if (idUser) {
+        localStorage.setItem("id_user", idUser);
+        localStorage.setItem("id_user_owner", activeUser);
+        sessionStorage.setItem("id_user", idUser);
+      }
+      return { idUser, role };
+    }
+
+    async function initOverview() {
+      const sess = enforceOverviewSession();
+      if (!sess) return;
+
+      currentBoundUser = sess.user;
+      document.getElementById("backLink").href = "dashboard.html";
+
+      try {
+        const resolved = await resolveIdUserForActiveSession(sess.user);
+        if (!enforceOverviewSession()) return;
+        if (!resolved) {
+          clearOverviewSessionKeys();
+          redirectOverviewTo("login.html");
+          return;
+        }
+
+        if (resolved.role === "ADMIN") {
+          localStorage.setItem("activeSessionUser", sess.user);
+          localStorage.setItem("activeSessionRole", "ADMIN");
+          localStorage.setItem("loggedUser", sess.user);
+          localStorage.setItem("loggedRole", "ADMIN");
+          redirectOverviewTo("admin_dashboard.html");
+          return;
+        }
+
+        localStorage.setItem("activeSessionUser", sess.user);
+        localStorage.setItem("activeSessionRole", "NASABAH");
+        localStorage.setItem("loggedUser", sess.user);
+        localStorage.setItem("loggedRole", "NASABAH");
+
+        const idUser = resolved.idUser;
+        currentBoundIdUser = idUser;
+        document.getElementById("userBadge").textContent = idUser
+          ? `ID Anggota: ${idUser}`
+          : "ID Anggota: Tidak ditemukan";
+
+        if (!idUser) {
+          document.getElementById("jenisList").innerHTML = `<div class="empty-state">ID anggota tidak ditemukan untuk akun ini.</div>`;
+          return;
+        }
+
+        const res = await fetch(`get_overview.php?id_user=${encodeURIComponent(idUser)}&_t=${Date.now()}`);
+        if (!enforceOverviewSession()) return;
+
+        const json = await res.json();
+        if (!enforceOverviewSession()) return;
+
+        if (json.status !== "success") {
+          throw new Error(json.message || "Gagal memuat data");
+        }
+        overviewData = json.periods;
+        renderPeriod();
+      } catch (err) {
+        if (!enforceOverviewSession()) return;
+        document.getElementById("jenisList").innerHTML = `<div class="empty-state">Error: ${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    initOverview();
+  </script>
+</body>
+</html>

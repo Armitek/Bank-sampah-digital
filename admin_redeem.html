@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifikasi & Pencairan Redeem Code - Bank Sampah Digital</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f4f7f4;
+            --surface: #ffffff;
+            --primary: #4a7c59;
+            --primary-hover: #3b6346;
+            --primary-light: #eaf2eb;
+            --accent: #88b04b;
+            --text-dark: #2c3e35;
+            --text-muted: #6c8075;
+            --border: #e1e8e3;
+            --radius: 20px;
+            --shadow: 0 15px 35px rgba(74, 124, 89, 0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, var(--surface) 0%, var(--primary-light) 100%);
+            padding: 24px 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 6px; height: 100%;
+            background: var(--primary);
+        }
+
+        .user-info h2 { font-size: 1.45rem; color: var(--text-dark); font-weight: 800; }
+        .user-info p { font-size: 0.9rem; color: var(--text-muted); margin-top: 4px; }
+
+        .badge-admin {
+            display: inline-block;
+            background: #b91c1c;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-left: 6px;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn-back {
+            text-decoration: none;
+            background: var(--surface);
+            color: var(--text-dark);
+            border: 1px solid var(--border);
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        .btn-back:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .btn-logout {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .btn-logout:hover { background: #fecaca; transform: translateY(-2px); }
+
+        .card {
+            background: var(--surface);
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .card h3 {
+            font-size: 1.2rem;
+            color: var(--text-dark);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #fafcfb;
+            color: var(--text-dark);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(74, 124, 89, 0.1);
+        }
+
+        .action-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .btn-check {
+            flex: 1;
+            min-width: 180px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+            padding: 13px 18px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-check:hover:not(:disabled) {
+            background: #dcebe0;
+        }
+
+        .btn-redeem {
+            flex: 1;
+            min-width: 200px;
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 13px 18px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(74, 124, 89, 0.25);
+            transition: all 0.2s ease;
+        }
+        .btn-redeem:hover:not(:disabled) {
+            background: var(--primary-hover);
+        }
+        .btn-redeem:disabled, .btn-check:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .result-box {
+            margin-top: 20px;
+            padding: 18px 20px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: #fafcfb;
+            display: none;
+            word-break: break-word;
+        }
+
+        .result-box.show {
+            display: block;
+        }
+
+        .result-box.success {
+            background: #ecfdf5;
+            border-color: #86efac;
+        }
+
+        .result-heading {
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 1rem;
+        }
+
+        .result-box.non-aktif {
+            background: #fef2f2;
+            border-color: #fca5a5;
+            color: #991b1b;
+        }
+
+        .result-box.non-aktif .result-heading {
+            color: #b91c1c;
+        }
+
+        .result-box.error {
+            background: #fef2f2;
+            border-color: #fca5a5;
+            color: #b91c1c;
+            font-weight: 700;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 640px) {
+            .detail-grid { grid-template-columns: 1fr; }
+        }
+
+        .status-pill {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 800;
+        }
+
+        .status-pill.aktif {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .status-pill.non-aktif {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        footer {
+            margin-top: 40px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="user-info">
+            <h2 id="adminRedeemTitle">Verifikasi &amp; Pencairan Redeem Code</h2>
+            <p>Cek status kode cashout 12 digit &amp; cairkan saldo tunai warga <span class="badge-admin">ADMIN</span></p>
+        </div>
+        <div class="nav-actions">
+            <a href="admin_dashboard.html" class="btn-back">← Kembali ke Panel Admin</a>
+            <button type="button" class="btn-logout" onclick="logoutAdminRedeem()">Keluar 🚪</button>
+        </div>
+    </header>
+
+    <div class="card">
+        <h3><span>🎟️</span> Cek &amp; Cairkan Kode Redeem 12 Digit</h3>
+
+        <form id="formRedeemAdmin" onsubmit="event.preventDefault(); handleCodeAction('check');">
+            <div class="form-group">
+                <label for="inputKodeRedeem">Kode Redeem (12 Karakter)</label>
+                <input
+                    type="text"
+                    id="inputKodeRedeem"
+                    maxlength="12"
+                    required
+                    placeholder="CONTOH: A1B2C3D4E5F6"
+                    oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();"
+                >
+            </div>
+
+            <div class="action-row">
+                <button type="submit" id="btnCekKode" class="btn-check">🔍 Cek Status Kode</button>
+                <button type="button" id="btnCairkanKode" class="btn-redeem" onclick="handleCodeAction('redeem')">💸 Cairkan Kode Redeem</button>
+            </div>
+        </form>
+
+        <div id="resultBox" class="result-box"></div>
+    </div>
+</div>
+
+<footer>
+    " The Earth is what we all have in common. " - Wendbell Berry
+</footer>
+
+<script>
+    let redirectingTarget = '';
+    let currentBoundAdmin = '';
+
+    function redirectTo(target) {
+        if (redirectingTarget === target) return;
+        redirectingTarget = target;
+        window.location.replace(target);
+    }
+
+    function clearAllSessions() {
+        localStorage.removeItem('activeSessionUser');
+        localStorage.removeItem('activeSessionRole');
+        localStorage.removeItem('loggedUser');
+        localStorage.removeItem('loggedRole');
+        localStorage.removeItem('adminLoggedUser');
+        localStorage.removeItem('nasabahLoggedUser');
+
+        sessionStorage.removeItem('activeSessionUser');
+        sessionStorage.removeItem('activeSessionRole');
+        sessionStorage.removeItem('loggedUser');
+        sessionStorage.removeItem('loggedRole');
+        sessionStorage.removeItem('adminLoggedUser');
+        sessionStorage.removeItem('nasabahLoggedUser');
+    }
+
+    function resolveAdminUser() {
+        const sessionAdmin = (sessionStorage.getItem('adminLoggedUser') || '').trim();
+        if (sessionAdmin) return sessionAdmin;
+
+        const activeUser = (localStorage.getItem('activeSessionUser') || '').trim();
+        const activeRole = (localStorage.getItem('activeSessionRole') || '').trim().toUpperCase();
+        if (activeUser && (!activeRole || activeRole === 'ADMIN')) {
+            return activeUser;
+        }
+
+        const loggedUser = (localStorage.getItem('loggedUser') || '').trim();
+        const loggedRole = (localStorage.getItem('loggedRole') || '').trim().toUpperCase();
+        if (loggedUser && (!loggedRole || loggedRole === 'ADMIN')) {
+            return loggedUser;
+        }
+
+        return (localStorage.getItem('adminLoggedUser') || '').trim();
+    }
+
+    function logoutAdminRedeem() {
+        clearAllSessions();
+        redirectTo('login.html');
+    }
+
+    async function verifyAdminAccess() {
+        const adminUser = resolveAdminUser();
+        if (!adminUser) {
+            clearAllSessions();
+            redirectTo('login.html');
+            return false;
+        }
+
+        try {
+            const res = await fetch(`get_user.php?username=${encodeURIComponent(adminUser)}&_t=${Date.now()}`);
+            const data = await res.json();
+            if (data.status !== 'success' || !data.user) {
+                logoutAdminRedeem();
+                return false;
+            }
+
+            const role = String(data.user.role || '').toUpperCase();
+            if (role !== 'ADMIN') {
+                alert("Akses ditolak: Akun ini bukan ADMIN.");
+                redirectTo('dashboard.html');
+                return false;
+            }
+
+            currentBoundAdmin = adminUser;
+            localStorage.setItem('activeSessionUser', adminUser);
+            localStorage.setItem('activeSessionRole', 'ADMIN');
+            localStorage.setItem('loggedUser', adminUser);
+            localStorage.setItem('loggedRole', 'ADMIN');
+            localStorage.setItem('adminLoggedUser', adminUser);
+            sessionStorage.setItem('adminLoggedUser', adminUser);
+            return true;
+        } catch (err) {
+            console.error("Gagal memverifikasi sesi admin:", err);
+            return true;
+        }
+    }
+
+    function syncSessionState() {
+        const latestUser = (
+            localStorage.getItem('activeSessionUser') ||
+            localStorage.getItem('loggedUser') ||
+            localStorage.getItem('adminLoggedUser') ||
+            ''
+        ).trim();
+
+        if (!latestUser) {
+            clearAllSessions();
+            redirectTo('login.html');
+            return;
+        }
+
+        if (currentBoundAdmin && latestUser !== currentBoundAdmin) {
+            verifyAdminAccess();
+        }
+    }
+
+    window.addEventListener('storage', function(e) {
+        if (
+            e.key === 'activeSessionUser' ||
+            e.key === 'activeSessionRole' ||
+            e.key === 'loggedUser' ||
+            e.key === 'loggedRole' ||
+            e.key === 'adminLoggedUser' ||
+            e.key === 'nasabahLoggedUser'
+        ) {
+            syncSessionState();
+        }
+    });
+
+    window.addEventListener('focus', syncSessionState);
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) syncSessionState();
+    });
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) redirectingTarget = '';
+        syncSessionState();
+    });
+
+    function formatRupiah(num) {
+        return "Rp " + Number(num || 0).toLocaleString("id-ID");
+    }
+
+    function escapeHtml(str) {
+        return String(str || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
+    }
+
+    function formatFriendlyError(parsedJson) {
+        if (parsedJson && typeof parsedJson.message === 'string' && parsedJson.message.trim()) {
+            const msg = parsedJson.message.trim();
+            if (/tidak ditemukan/i.test(msg)) {
+                return "Kode Redeem Tidak Valid !";
+            }
+            return msg;
+        }
+        return "Kode Redeem Tidak Valid !";
+    }
+
+    function setButtonsBusy(busy) {
+        document.getElementById('btnCekKode').disabled = busy;
+        document.getElementById('btnCairkanKode').disabled = busy;
+    }
+
+    async function handleCodeAction(action) {
+        const kodeInput = document.getElementById('inputKodeRedeem');
+        const kodeRedeem = kodeInput.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().trim();
+        const resultBox = document.getElementById('resultBox');
+        const adminUsername = (currentBoundAdmin || resolveAdminUser() || '').trim();
+
+        if (!kodeRedeem) {
+            resultBox.className = "result-box show error";
+            resultBox.innerHTML = "Kode Redeem Tidak Valid !";
+            return;
+        }
+
+        setButtonsBusy(true);
+        try {
+            const res = await fetch('admin_redeem_code.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action,
+                    kode_redeem: kodeRedeem,
+                    admin_username: adminUsername
+                })
+            });
+
+            const rawText = await res.text();
+            let data = null;
+            try {
+                data = JSON.parse(rawText);
+            } catch (parseErr) {
+                data = null;
+            }
+
+            if (!res.ok || !data || data.status !== 'success') {
+                resultBox.className = "result-box show error";
+                resultBox.innerHTML = escapeHtml(formatFriendlyError(data));
+                return;
+            }
+
+            const info = data.data || {};
+            const statusUpper = String(info.status || 'AKTIF').toUpperCase();
+            const isNonAktif = statusUpper === 'NON_AKTIF';
+            const pillClass = isNonAktif ? 'non-aktif' : 'aktif';
+            const boxStateClass = (action === 'check' && isNonAktif) ? 'non-aktif' : 'success';
+            const sisaKasHtml = (typeof info.kas_bank_sisa === 'number')
+                ? `<div><strong>Sisa Kas Bank:</strong> ${formatRupiah(info.kas_bank_sisa)}</div>`
+                : '';
+
+            resultBox.className = `result-box show ${boxStateClass}`;
+            resultBox.innerHTML = `
+                <div class="result-heading">${escapeHtml(data.message || "Berhasil")}</div>
+                <div class="detail-grid">
+                    <div><strong>Kode:</strong> ${escapeHtml(info.kode_redeem || kodeRedeem)}</div>
+                    <div><strong>Status:</strong> <span class="status-pill ${pillClass}">${escapeHtml(statusUpper)}</span></div>
+                    <div><strong>Nasabah:</strong> ${escapeHtml(info.nama_user || '-')} (ID: ${escapeHtml(info.id_user || '-')})</div>
+                    <div><strong>Nominal Cashout:</strong> ${formatRupiah(info.nominal || 0)}</div>
+                    <div><strong>Dibuat:</strong> ${escapeHtml(info.created_at || '-')}</div>
+                    <div><strong>Dicairkan:</strong> ${escapeHtml(info.redeemed_at || '-')}</div>
+                    ${sisaKasHtml}
+                </div>
+            `;
+        } catch (err) {
+            resultBox.className = "result-box show error";
+            resultBox.innerHTML = "Kode Redeem Tidak Valid !";
+        } finally {
+            setButtonsBusy(false);
+        }
+    }
+
+    verifyAdminAccess();
+</script>
+
+</body>
+</html>

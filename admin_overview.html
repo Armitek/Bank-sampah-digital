@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overview Admin - Bank Sampah Digital</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f4f7f4;
+            --surface: #ffffff;
+            --primary: #4a7c59;
+            --primary-hover: #3b6346;
+            --primary-light: #eaf2eb;
+            --text-dark: #2c3e35;
+            --text-muted: #6c8075;
+            --border: #e1e8e3;
+            --radius: 20px;
+            --shadow: 0 15px 35px rgba(74, 124, 89, 0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px 20px;
+        }
+
+        .container { width: 100%; max-width: 950px; margin: 0 auto; }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, var(--surface) 0%, var(--primary-light) 100%);
+            padding: 24px 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 6px; height: 100%;
+            background: var(--primary);
+        }
+
+        .user-info h2 { font-size: 1.45rem; font-weight: 800; color: var(--text-dark); }
+        .user-info p { font-size: 0.88rem; color: var(--text-muted); margin-top: 4px; }
+
+        .badge-admin {
+            display: inline-block;
+            background: #b91c1c;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-left: 6px;
+        }
+
+        .nav-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+        .btn-nav {
+            text-decoration: none;
+            background: var(--surface);
+            color: var(--text-dark);
+            border: 1px solid var(--border);
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.86rem;
+            transition: all 0.2s ease;
+        }
+        .btn-nav:hover { border-color: var(--primary); background: var(--primary-light); }
+
+        .btn-logout {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.86rem;
+        }
+        .btn-logout:hover { background: #fecaca; transform: translateY(-1px); }
+
+        .period-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
+        @media (max-width: 700px) { .period-tabs { grid-template-columns: repeat(2, 1fr); } }
+
+        .period-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 13px 12px;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            box-shadow: var(--shadow);
+            transition: all 0.2s ease;
+        }
+        .period-btn.active { background: var(--primary); color: #ffffff; border-color: var(--primary); }
+
+        .cluster-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .cluster-toolbar-info {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        .cluster-toolbar-sub {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .btn-export-cluster {
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.86rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-export-cluster:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 24px; }
+        @media (max-width: 780px) { .metrics-grid { grid-template-columns: 1fr; } }
+
+        .metric-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+        }
+        .metric-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.7px; font-weight: 800; color: var(--text-muted); margin-bottom: 10px; }
+        .metric-value { font-size: 1.85rem; font-weight: 800; margin-bottom: 6px; }
+        .metric-value.green { color: var(--primary); }
+        .metric-value.red { color: #dc2626; }
+        .metric-sub { font-size: 0.83rem; color: var(--text-muted); }
+
+        .card {
+            background: var(--surface);
+            padding: 28px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        .card h3 { font-size: 1.12rem; font-weight: 800; margin-bottom: 16px; }
+
+        .jenis-list { display: flex; flex-direction: column; gap: 10px; }
+        .jenis-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #fafcfb;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .jenis-name { font-weight: 800; font-size: 0.96rem; }
+        .jenis-meta { font-size: 0.82rem; color: var(--text-muted); margin-top: 2px; }
+        .jenis-right { text-align: right; }
+        .jenis-bobot {
+            background: var(--primary-light); color: var(--primary); font-weight: 800;
+            font-size: 0.82rem; padding: 4px 10px; border-radius: 999px; display: inline-block;
+        }
+        .jenis-uang { font-weight: 800; font-size: 0.92rem; color: var(--text-dark); margin-top: 4px; }
+
+        .empty-state {
+            text-align: center; padding: 26px 14px; color: var(--text-muted);
+            font-size: 0.9rem; background: #fafcfb; border: 1.5px dashed var(--border); border-radius: 12px;
+        }
+
+        footer { margin-top: 40px; color: var(--text-muted); font-size: 0.85rem; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="user-info">
+            <h2>📊 Overview Operasional Admin <span class="badge-admin">ADMIN</span></h2>
+            <p id="periodSubtitle">Ringkasan bobot sampah, masukan sampah, dan kas keluar</p>
+        </div>
+        <div class="nav-actions">
+            <a href="admin_dashboard.html" class="btn-nav">← Kembali ke Panel Admin</a>
+            <button type="button" class="btn-logout" onclick="logoutOverviewAdmin()">Keluar 🚪</button>
+        </div>
+    </header>
+
+    <div class="period-tabs">
+        <button type="button" class="period-btn" data-range="3d" onclick="selectRange('3d')">3 Hari</button>
+        <button type="button" class="period-btn" data-range="7d" onclick="selectRange('7d')">7 Hari</button>
+        <button type="button" class="period-btn active" data-range="30d" onclick="selectRange('30d')">Sebulan (30 Hari)</button>
+        <button type="button" class="period-btn" data-range="all" onclick="selectRange('all')">Lifetime</button>
+    </div>
+
+    <div class="cluster-toolbar">
+        <div>
+            <div class="cluster-toolbar-info" id="activeClusterBadge">Klaster Aktif: Sebulan (30 Hari)</div>
+            <div class="cluster-toolbar-sub">Unduh tabel Excel (.xls) rekap &amp; rincian jenis sampah khusus klaster yang sedang dipilih</div>
+        </div>
+        <button type="button" class="btn-export-cluster" id="btnDownloadClusterReport" onclick="downloadClusterReport()">
+            📊 Cetak Tabel Excel Klaster Sebulan (30 Hari)
+        </button>
+    </div>
+
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-label">Bobot Sampah</div>
+            <div class="metric-value green" id="valBobot">0 Kg</div>
+            <div class="metric-sub" id="subPcsSetoran">0 pcs • 0 transaksi setoran</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Total Masukan Sampah</div>
+            <div class="metric-value green" id="valMasukan">Rp 0</div>
+            <div class="metric-sub">Nilai setoran sampah masuk periode ini</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Kas Keluar</div>
+            <div class="metric-value red" id="valKasKeluar">Rp 0</div>
+            <div class="metric-sub" id="subCashout">0 pencairan kode redeem</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Rincian Bobot &amp; Nilai per Jenis Sampah</h3>
+        <div class="jenis-list" id="jenisList">
+            <div class="empty-state">Memuat data overview admin...</div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    " The Earth is what we all have in common. " - Wendbell Berry
+</footer>
+
+<script>
+    const PERIOD_LABELS = {
+        "3d":  "Overview Admin • 3 Hari Terakhir",
+        "7d":  "Overview Admin • 7 Hari Terakhir",
+        "30d": "Overview Admin • Sebulan (30 Hari Terakhir)",
+        "all": "Overview Admin • Lifetime (Seluruh Waktu)"
+    };
+
+    const CLUSTER_SHORT_LABELS = {
+        "3d":  "3 Hari",
+        "7d":  "7 Hari",
+        "30d": "Sebulan (30 Hari)",
+        "all": "Lifetime"
+    };
+
+    let adminPeriods = null;
+    let activeRange = "30d";
+    let redirectingOverviewTarget = "";
+    let boundOverviewAdmin = "";
+
+    function redirectOverviewTo(target) {
+        if (redirectingOverviewTarget === target) return;
+        redirectingOverviewTarget = target;
+        window.location.replace(target);
+    }
+
+    function clearOverviewSessions() {
+        try {
+            localStorage.removeItem("activeSessionUser");
+            localStorage.removeItem("activeSessionRole");
+            localStorage.removeItem("loggedUser");
+            localStorage.removeItem("loggedRole");
+            localStorage.removeItem("adminLoggedUser");
+            localStorage.removeItem("nasabahLoggedUser");
+        } catch (e) {}
+
+        try {
+            sessionStorage.removeItem("activeSessionUser");
+            sessionStorage.removeItem("activeSessionRole");
+            sessionStorage.removeItem("loggedUser");
+            sessionStorage.removeItem("loggedRole");
+            sessionStorage.removeItem("adminLoggedUser");
+            sessionStorage.removeItem("nasabahLoggedUser");
+        } catch (e) {}
+    }
+
+    function resolveOverviewAdminUser() {
+        try {
+            const activeUser = (localStorage.getItem("activeSessionUser") || "").trim();
+            const activeRole = (localStorage.getItem("activeSessionRole") || "").trim().toUpperCase();
+            if (activeUser && (!activeRole || activeRole === "ADMIN")) {
+                return activeUser;
+            }
+
+            const loggedUser = (localStorage.getItem("loggedUser") || "").trim();
+            const loggedRole = (localStorage.getItem("loggedRole") || "").trim().toUpperCase();
+            if (loggedUser && (!loggedRole || loggedRole === "ADMIN")) {
+                return loggedUser;
+            }
+
+            return (localStorage.getItem("adminLoggedUser") || "").trim();
+        } catch (e) {
+            return "";
+        }
+    }
+
+    function logoutOverviewAdmin() {
+        clearOverviewSessions();
+        redirectOverviewTo("login.html");
+    }
+
+    function syncOverviewSession() {
+        const latestUser = resolveOverviewAdminUser();
+        if (!latestUser) {
+            clearOverviewSessions();
+            redirectOverviewTo("login.html");
+            return false;
+        }
+
+        if (boundOverviewAdmin && latestUser !== boundOverviewAdmin) {
+            verifyOverviewAdminSession();
+        }
+        return true;
+    }
+
+    async function verifyOverviewAdminSession() {
+        const adminUser = resolveOverviewAdminUser();
+        if (!adminUser) {
+            clearOverviewSessions();
+            redirectOverviewTo("login.html");
+            return false;
+        }
+
+        try {
+            const res = await fetch(`get_user.php?username=${encodeURIComponent(adminUser)}&_t=${Date.now()}`);
+            if (!syncOverviewSession()) return false;
+
+            const data = await res.json();
+            if (!syncOverviewSession()) return false;
+
+            if (data.status !== "success" || !data.user) {
+                logoutOverviewAdmin();
+                return false;
+            }
+
+            const role = String(data.user.role || "").toUpperCase();
+            if (role !== "ADMIN") {
+                redirectOverviewTo("dashboard.html");
+                return false;
+            }
+
+            boundOverviewAdmin = adminUser;
+            try {
+                localStorage.setItem("activeSessionUser", adminUser);
+                localStorage.setItem("activeSessionRole", "ADMIN");
+                localStorage.setItem("loggedUser", adminUser);
+                localStorage.setItem("loggedRole", "ADMIN");
+                localStorage.setItem("adminLoggedUser", adminUser);
+                sessionStorage.setItem("adminLoggedUser", adminUser);
+            } catch (e) {}
+            return true;
+        } catch (err) {
+            console.error("Gagal memverifikasi sesi overview admin:", err);
+            return syncOverviewSession();
+        }
+    }
+
+    syncOverviewSession();
+
+    window.addEventListener("storage", function() {
+        syncOverviewSession();
+    });
+
+    window.addEventListener("focus", syncOverviewSession);
+    document.addEventListener("visibilitychange", function() {
+        if (!document.hidden) syncOverviewSession();
+    });
+    window.addEventListener("pageshow", function(event) {
+        if (event.persisted) redirectingOverviewTarget = "";
+        syncOverviewSession();
+    });
+
+    setInterval(function() {
+        if (!document.hidden && !redirectingOverviewTarget) {
+            syncOverviewSession();
+        }
+    }, 1000);
+
+    function formatRupiah(num) {
+        return "Rp " + Number(num || 0).toLocaleString("id-ID");
+    }
+
+    function formatAngkaTitik(num) {
+        return Number(num || 0).toLocaleString("id-ID");
+    }
+
+    function formatKg(val) {
+        const n = Number(val || 0);
+        return (Number.isInteger(n) ? n : n.toFixed(2).replace(/\.?0+$/, "")) + " Kg";
+    }
+
+    function escapeHtml(str) {
+        return String(str || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
+    }
+
+    function downloadClusterReport() {
+        if (!syncOverviewSession()) return;
+
+        if (!adminPeriods || !adminPeriods[activeRange]) {
+            alert("Data klaster belum siap dimuat.");
+            return;
+        }
+
+        const p = adminPeriods[activeRange];
+        const clusterLabel = CLUSTER_SHORT_LABELS[activeRange] || activeRange;
+        const nowText = new Date().toLocaleString("id-ID");
+        const jenisRows = Array.isArray(p.per_jenis) ? p.per_jenis : [];
+
+        const tableRowsHtml = jenisRows.length > 0
+            ? jenisRows.map((item, idx) => `
+                <tr>
+                    <td align="left" bgcolor="#ffffff">${idx + 1}</td>
+                    <td align="left" bgcolor="#ffffff">${escapeHtml(item.nama_jenis || "-")}</td>
+                    <td align="center" bgcolor="#ffffff">${escapeHtml(item.kode_sampah || "-")}</td>
+                    <td align="center" bgcolor="#ffffff">${Number(item.jumlah_barang || 0)}</td>
+                    <td align="center" bgcolor="#ffffff">${Number(item.bobot_kg || 0)}</td>
+                    <td align="center" bgcolor="#ffffff">${escapeHtml(formatAngkaTitik(item.total_uang))}</td>
+                </tr>
+            `).join("")
+            : `
+                <tr>
+                    <td colspan="6" align="center" bgcolor="#ffffff" style="color:#6c8075;">Belum ada setoran sampah tercatat pada klaster ini.</td>
+                </tr>
+            `;
+
+        const xlsHtml = `
+            <html xmlns:o="urn:schemas-microsoft-com:office:office"
+                  xmlns:x="urn:schemas-microsoft-com:office:excel"
+                  xmlns="http://www.w3.org/TR/REC-html40">
+            <head>
+                <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+                <style>
+                    body { font-family: Arial, sans-serif; color: #2c3e35; }
+                    h2 { margin-bottom: 4px; color: #2c3e35; }
+                    p { margin: 2px 0 12px 0; font-size: 12px; color: #55665d; }
+                    table { border-collapse: collapse; width: 100%; }
+                    th, td { border: 1px solid #9fb0a5; padding: 8px 12px; font-size: 12px; }
+                    .spacer-row td { border: none !important; background: transparent !important; height: 18px; padding: 0; }
+                    .section-title td { border: none !important; background: transparent !important; font-weight: bold; font-size: 13px; color: #2c3e35; padding: 6px 0 6px 0; }
+                </style>
+            </head>
+            <body>
+                <h2>LAPORAN OVERVIEW OPERASIONAL ADMIN</h2>
+                <p><strong>Klaster Periode:</strong> ${escapeHtml(clusterLabel)} &nbsp;|&nbsp; <strong>Tanggal Cetak:</strong> ${escapeHtml(nowText)}</p>
+
+                <table>
+                    <tr class="section-title">
+                        <td colspan="2">1. Ringkasan Klaster (${escapeHtml(clusterLabel)})</td>
+                    </tr>
+                    <tr>
+                        <th bgcolor="#4a7c59" color="#ffffff" align="center" style="background-color:#4a7c59;color:#ffffff;font-weight:bold;">Indikator</th>
+                        <th bgcolor="#4a7c59" color="#ffffff" align="center" style="background-color:#4a7c59;color:#ffffff;font-weight:bold;">Nilai</th>
+                    </tr>
+                    <tr>
+                        <td bgcolor="#f4f7f4" style="background-color:#f4f7f4;font-weight:bold;">Bobot Sampah</td>
+                        <td align="center" bgcolor="#ffffff">${escapeHtml(formatKg(p.bobot_sampah))}</td>
+                    </tr>
+                    <tr>
+                        <td bgcolor="#f4f7f4" style="background-color:#f4f7f4;font-weight:bold;">Total Pcs Setoran</td>
+                        <td align="center" bgcolor="#ffffff">${Number(p.total_pcs || 0)}</td>
+                    </tr>
+                    <tr>
+                        <td bgcolor="#f4f7f4" style="background-color:#f4f7f4;font-weight:bold;">Jumlah Transaksi Setoran</td>
+                        <td align="center" bgcolor="#ffffff">${Number(p.jumlah_setoran || 0)}</td>
+                    </tr>
+                    <tr>
+                        <td bgcolor="#f4f7f4" style="background-color:#f4f7f4;font-weight:bold;">Total Masukan Sampah (Rp)</td>
+                        <td align="center" bgcolor="#ffffff">${escapeHtml(formatAngkaTitik(p.total_masukan_sampah))}</td>
+                    </tr>
+                    <tr>
+                        <td bgcolor="#f4f7f4" style="background-color:#f4f7f4;font-weight:bold;">Kas Keluar (Rp)</td>
+                        <td align="center" bgcolor="#ffffff">${escapeHtml(formatAngkaTitik(p.kas_keluar))}</td>
+                    </tr>
+                    <tr>
+                        <td bgcolor="#f4f7f4" style="background-color:#f4f7f4;font-weight:bold;">Jumlah Pencairan Kode Redeem</td>
+                        <td align="center" bgcolor="#ffffff">${Number(p.jumlah_cashout || 0)}</td>
+                    </tr>
+
+                    <tr class="spacer-row">
+                        <td colspan="6" height="18"></td>
+                    </tr>
+
+                    <tr class="section-title">
+                        <td colspan="6">2. Rincian Bobot &amp; Nilai per Jenis Sampah</td>
+                    </tr>
+                    <tr>
+                        <th bgcolor="#4a7c59" color="#ffffff" align="left" style="background-color:#4a7c59;color:#ffffff;font-weight:bold;">No</th>
+                        <th bgcolor="#4a7c59" color="#ffffff" align="center" style="background-color:#4a7c59;color:#ffffff;font-weight:bold;">Nama Jenis Sampah</th>
+                        <th bgcolor="#4a7c59" color="#ffffff" align="center" style="background-color:#4a7c59;color:#ffffff;font-weight:bold;">Kode Sampah</th>
+                        <th bgcolor="#4a7c59" color="#ffffff" align="center" style="background-color:#4a7c59;color:#ffffff;font-weight:bold;">Jumlah Barang (pcs)</th>
+                        <th bgcolor="#4a7c59" color="#ffffff" align="center" style="background-color:#4a7c59;color:#ffffff;font-weight:bold;">Bobot (Kg)</th>
+                        <th bgcolor="#4a7c59" color="#ffffff" align="center" style="background-color:#4a7c59;color:#ffffff;font-weight:bold;">Total Nilai (Rp)</th>
+                    </tr>
+                    ${tableRowsHtml}
+                </table>
+            </body>
+            </html>
+        `;
+
+        const blob = new Blob(["\uFEFF" + xlsHtml], {
+            type: "application/vnd.ms-excel;charset=utf-8;"
+        });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        const safeClusterSlug = activeRange.replace(/[^a-zA-Z0-9_-]/g, "");
+        a.href = url;
+        a.download = `laporan_overview_admin_klaster_${safeClusterSlug}.xls`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    function selectRange(range) {
+        if (!syncOverviewSession()) return;
+        activeRange = range;
+        document.querySelectorAll(".period-btn").forEach(btn => {
+            btn.classList.toggle("active", btn.dataset.range === range);
+        });
+        renderAdminOverview();
+    }
+
+    function renderAdminOverview() {
+        const shortLabel = CLUSTER_SHORT_LABELS[activeRange] || activeRange;
+        document.getElementById("periodSubtitle").textContent = PERIOD_LABELS[activeRange] || "Overview Admin";
+        document.getElementById("activeClusterBadge").textContent = `Klaster Aktif: ${shortLabel}`;
+        document.getElementById("btnDownloadClusterReport").textContent = `📊 Cetak Tabel Excel Klaster ${shortLabel}`;
+
+        if (!adminPeriods || !adminPeriods[activeRange]) return;
+
+        const p = adminPeriods[activeRange];
+        document.getElementById("valBobot").textContent = formatKg(p.bobot_sampah);
+        document.getElementById("subPcsSetoran").textContent =
+            `${Number(p.total_pcs || 0).toLocaleString("id-ID")} pcs • ${Number(p.jumlah_setoran || 0).toLocaleString("id-ID")} setoran`;
+        document.getElementById("valMasukan").textContent = formatRupiah(p.total_masukan_sampah);
+        document.getElementById("valKasKeluar").textContent = formatRupiah(p.kas_keluar);
+        document.getElementById("subCashout").textContent =
+            `${Number(p.jumlah_cashout || 0).toLocaleString("id-ID")} pencairan kode redeem`;
+
+        const listEl = document.getElementById("jenisList");
+        if (!Array.isArray(p.per_jenis) || p.per_jenis.length === 0) {
+            listEl.innerHTML = `<div class="empty-state">Belum ada setoran sampah tercatat pada periode ini.</div>`;
+            return;
+        }
+
+        listEl.innerHTML = p.per_jenis.map(item => `
+            <div class="jenis-row">
+                <div>
+                    <div class="jenis-name">${escapeHtml(item.nama_jenis)}</div>
+                    <div class="jenis-meta">Kode: ${escapeHtml(item.kode_sampah)} • ${Number(item.jumlah_barang || 0).toLocaleString("id-ID")} pcs</div>
+                </div>
+                <div class="jenis-right">
+                    <span class="jenis-bobot">${formatKg(item.bobot_kg)}</span>
+                    <div class="jenis-uang">${formatRupiah(item.total_uang)}</div>
+                </div>
+            </div>
+        `).join("");
+    }
+
+    async function initAdminOverview() {
+        if (!syncOverviewSession()) return;
+        const ok = await verifyOverviewAdminSession();
+        if (!ok || redirectingOverviewTarget) return;
+
+        try {
+            const res = await fetch(`get_admin_overview.php?_t=${Date.now()}`);
+            if (!syncOverviewSession()) return;
+
+            const data = await res.json();
+            if (!syncOverviewSession() || redirectingOverviewTarget) return;
+
+            if (data.status !== "success" || !data.periods) {
+                throw new Error(data.message || "Gagal memuat overview admin");
+            }
+            adminPeriods = data.periods;
+            renderAdminOverview();
+        } catch (err) {
+            if (!syncOverviewSession() || redirectingOverviewTarget) return;
+            document.getElementById("jenisList").innerHTML = `<div class="empty-state">Error: ${escapeHtml(err.message)}</div>`;
+        }
+    }
+
+    initAdminOverview();
+</script>
+
+</body>
+</html>

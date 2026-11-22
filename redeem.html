@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redeem Code - Bank Sampah Digital</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f4f7f4;
+            --surface: #ffffff;
+            --primary: #4a7c59;
+            --primary-hover: #3b6346;
+            --primary-light: #eaf2eb;
+            --accent: #88b04b;
+            --text-dark: #2c3e35;
+            --text-muted: #6c8075;
+            --border: #e1e8e3;
+            --radius: 20px;
+            --shadow: 0 15px 35px rgba(74, 124, 89, 0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface);
+            padding: 20px 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .header-left h2 {
+            font-size: 1.4rem;
+            color: var(--text-dark);
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-left p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .sms-trigger-btn {
+            position: relative;
+            background: var(--primary-light);
+            color: var(--primary);
+            border: 1px solid #cce0d0;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .sms-trigger-btn:hover {
+            background: #dcebe0;
+            transform: translateY(-1px);
+        }
+
+        .sms-badge {
+            background: var(--primary);
+            color: #ffffff;
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 999px;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .btn-back {
+            text-decoration: none;
+            background: var(--surface);
+            color: var(--text-dark);
+            border: 1px solid var(--border);
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.88rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-back:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .saldo-banner {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--primary-light) 100%);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .saldo-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .saldo-amount {
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-top: 4px;
+        }
+
+        .saldo-note {
+            font-size: 0.86rem;
+            color: var(--text-muted);
+            max-width: 420px;
+            line-height: 1.5;
+        }
+
+        .sms-drawer {
+            display: none;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px 26px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+        }
+
+        .sms-drawer.open {
+            display: block;
+        }
+
+        .sms-top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sms-mode-switch {
+            display: inline-flex;
+            background: #f1f5f2;
+            padding: 4px;
+            border-radius: 12px;
+            gap: 4px;
+        }
+
+        .sms-mode-btn {
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            padding: 7px 14px;
+            border-radius: 9px;
+            font-weight: 700;
+            font-size: 0.84rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sms-mode-btn.active {
+            background: var(--surface);
+            color: var(--primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .code-cards-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .code-item-card {
+            border: 1px solid var(--border);
+            background: #fafcfb;
+            border-radius: 14px;
+            padding: 14px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .code-value {
+            font-family: monospace;
+            font-size: 1.12rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: var(--text-dark);
+        }
+
+        .code-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        .code-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .code-nominal {
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+
+        .status-tag {
+            font-size: 0.74rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 999px;
+        }
+
+        .status-tag.aktif {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .status-tag.non-aktif {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .btn-copy-mini {
+            background: var(--primary-light);
+            color: var(--primary);
+            border: 1px solid #cde0d1;
+            padding: 6px 12px;
+            border-radius: 9px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-copy-mini:hover {
+            background: #dcebe0;
+        }
+
+        .empty-codes {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            padding: 20px 10px;
+        }
+
+        .pagination-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .page-btn {
+            min-width: 34px;
+            height: 34px;
+            padding: 0 10px;
+            border-radius: 9px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-dark);
+            font-weight: 700;
+            font-size: 0.84rem;
+            cursor: pointer;
+        }
+
+        .page-btn.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .panel-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .panel-heading {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+
+        .panel-sub {
+            font-size: 0.86rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .voucher-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .voucher-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .voucher-btn {
+            border: 1.5px solid var(--primary);
+            background: var(--primary-light);
+            color: var(--text-dark);
+            border-radius: 16px;
+            padding: 18px 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .voucher-btn:hover:not(:disabled) {
+            background: var(--primary);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(74, 124, 89, 0.2);
+        }
+
+        .voucher-btn:hover:not(:disabled) .voucher-sub {
+            color: #e6f2e8;
+        }
+
+        .voucher-btn:disabled {
+            background: #f1f3f2;
+            border-color: #d6dcd8;
+            color: #9aa69f;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .voucher-nominal {
+            font-size: 1.12rem;
+            font-weight: 800;
+        }
+
+        .voucher-sub {
+            font-size: 0.76rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .voucher-btn:disabled .voucher-sub {
+            color: #a4afa8;
+        }
+
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(24, 36, 29, 0.45);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-backdrop.show {
+            display: flex;
+        }
+
+        .modal-card {
+            background: var(--surface);
+            border-radius: 22px;
+            max-width: 440px;
+            width: 100%;
+            padding: 28px;
+            box-shadow: 0 24px 50px rgba(0, 0, 0, 0.18);
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .modal-card h3 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .modal-card p {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+        }
+
+        .code-display-box {
+            background: var(--primary-light);
+            border: 1.5px dashed var(--primary);
+            border-radius: 14px;
+            padding: 16px;
+            font-family: monospace;
+            font-size: 1.55rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            color: var(--primary);
+            margin-bottom: 12px;
+            user-select: all;
+        }
+
+        .modal-nominal-info {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .btn-primary-modal {
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 11px 18px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn-secondary-modal {
+            background: #eef2ef;
+            color: var(--text-dark);
+            border: none;
+            padding: 11px 18px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        footer {
+            margin-top: 40px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="header-left">
+            <h2><span>🎟️</span> Redeem Code</h2>
+            <p>ID Anggota: <strong id="redeemUserId">-</strong></p>
+        </div>
+        <div class="header-actions">
+            <button type="button" class="sms-trigger-btn" onclick="toggleSmsDrawer()" title="Lihat SMS Kode Redeem">
+                <span>✉️</span>
+                <span>SMS Kode</span>
+                <span class="sms-badge" id="smsAktifCount">0</span>
+            </button>
+            <a href="dashboard.html" id="linkBackDashboard" class="btn-back">← Kembali ke Dashboard</a>
+        </div>
+    </header>
+
+    <div class="sms-drawer" id="smsDrawer">
+        <div class="sms-top-row">
+            <div>
+                <div class="panel-heading" style="margin-bottom: 2px;">Pesan Kode Redeem Anda</div>
+                <div style="font-size: 0.82rem; color: var(--text-muted);">Pilih kategori status kode untuk melihat daftar kode</div>
+            </div>
+            <div class="sms-mode-switch">
+                <button type="button" class="sms-mode-btn active" id="tabSmsAktif" onclick="switchSmsMode('AKTIF')">Kode Aktif</button>
+                <button type="button" class="sms-mode-btn" id="tabSmsNonAktif" onclick="switchSmsMode('NON_AKTIF')">Non-Aktif</button>
+            </div>
+        </div>
+        <div class="code-cards-list" id="smsCodesList">
+            <div class="empty-codes">Memuat daftar kode...</div>
+        </div>
+        <div id="smsPagination"></div>
+    </div>
+
+    <div class="saldo-banner">
+        <div>
+            <div class="saldo-label">Saldo Tersedia untuk Redeem</div>
+            <div class="saldo-amount" id="redeemSaldo">Rp 0</div>
+        </div>
+        <div class="saldo-note">
+            Pilih nominal voucher di bawah. Kode 12 digit yang terbit dapat dicairkan di bank sampah fisik dan otomatis tercatat sebagai pengeluaran di riwayat transaksi.
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <div class="panel-heading">Pilih Nominal Voucher Redeem</div>
+        <div class="panel-sub">Voucher berwarna hijau dapat ditekan; voucher abu-abu menandakan saldo Anda belum mencukupi.</div>
+
+        <div class="voucher-grid" id="voucherGrid"></div>
+    </div>
+</div>
+
+<div class="modal-backdrop" id="redeemModal">
+    <div class="modal-card">
+        <h3>Kode Redeem Berhasil Dibuat!</h3>
+        <p>Tunjukkan kode 12 digit ini kepada petugas bank sampah untuk pencairan dana.</p>
+        <div class="code-display-box" id="modalKode12">-</div>
+        <div class="modal-nominal-info" id="modalNominalInfo">Nominal Cashout: Rp 0</div>
+        <div class="modal-actions">
+            <button type="button" class="btn-primary-modal" onclick="copyModalKode()">📋 Salin Kode</button>
+            <button type="button" class="btn-secondary-modal" onclick="closeRedeemModal()">Tutup</button>
+        </div>
+    </div>
+</div>
+
+<footer>
+    " The Earth is what we all have in common. " - Wendbell Berry
+</footer>
+
+<script>
+    if (window.location.search) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    const NOMINAL_LIST = [5000, 10000, 20000, 50000, 100000, 250000, 500000, 1000000];
+    const SMS_PER_PAGE = 5;
+
+    function resolveNasabahUser() {
+        const sNasabah = (sessionStorage.getItem("nasabahLoggedUser") || "").trim();
+        if (sNasabah) return sNasabah;
+
+        const lNasabah = (localStorage.getItem("nasabahLoggedUser") || "").trim();
+        if (lNasabah) return lNasabah;
+
+        const activeUser = (localStorage.getItem("activeSessionUser") || "").trim();
+        const activeRole = (localStorage.getItem("activeSessionRole") || "").trim().toUpperCase();
+        if (activeUser && activeRole === "NASABAH") return activeUser;
+
+        const loggedUser = (localStorage.getItem("loggedUser") || "").trim();
+        const loggedRole = (localStorage.getItem("loggedRole") || "").trim().toUpperCase();
+        if (loggedUser && (!loggedRole || loggedRole === "NASABAH")) return loggedUser;
+
+        return "";
+    }
+
+    let currentUsername = resolveNasabahUser();
+    let currentIdUser = "";
+    let currentSaldo = 0;
+    let listAktif = [];
+    let listNonAktif = [];
+    let smsMode = "AKTIF";
+    let smsPageAktif = 1;
+    let smsPageNonAktif = 1;
+    let isSubmittingRedeem = false;
+    let redirectingRedeemTarget = "";
+
+    function redirectRedeemTo(target) {
+        if (redirectingRedeemTarget === target) return;
+        redirectingRedeemTarget = target;
+        window.location.replace(target);
+    }
+
+    function clearRedeemSessionKeys() {
+        localStorage.removeItem("activeSessionUser");
+        localStorage.removeItem("activeSessionRole");
+        localStorage.removeItem("loggedUser");
+        localStorage.removeItem("loggedRole");
+        localStorage.removeItem("nasabahLoggedUser");
+
+        sessionStorage.removeItem("activeSessionUser");
+        sessionStorage.removeItem("activeSessionRole");
+        sessionStorage.removeItem("loggedUser");
+        sessionStorage.removeItem("loggedRole");
+        sessionStorage.removeItem("nasabahLoggedUser");
+    }
+
+    function syncRedeemSession() {
+        const latest = resolveNasabahUser();
+        if (!latest) {
+            clearRedeemSessionKeys();
+            redirectRedeemTo("login.html");
+            return;
+        }
+        if (currentUsername && latest !== currentUsername) {
+            currentUsername = latest;
+            initRedeemPage();
+        }
+    }
+
+    window.addEventListener("storage", function(e) {
+        if (
+            e.key === "activeSessionUser" ||
+            e.key === "activeSessionRole" ||
+            e.key === "loggedUser" ||
+            e.key === "loggedRole" ||
+            e.key === "nasabahLoggedUser"
+        ) {
+            syncRedeemSession();
+        }
+    });
+
+    window.addEventListener("focus", syncRedeemSession);
+    document.addEventListener("visibilitychange", function() {
+        if (!document.hidden) syncRedeemSession();
+    });
+    window.addEventListener("pageshow", function(event) {
+        if (event.persisted) redirectingRedeemTarget = "";
+        syncRedeemSession();
+    });
+
+    function formatRupiah(num) {
+        return "Rp " + Number(num || 0).toLocaleString("id-ID");
+    }
+
+    function escapeHtml(str) {
+        return String(str || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
+    }
+
+    function renderVouchers() {
+        const grid = document.getElementById("voucherGrid");
+        grid.innerHTML = "";
+
+        NOMINAL_LIST.forEach((nominal) => {
+            const cukup = currentSaldo >= nominal;
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "voucher-btn";
+            btn.disabled = !cukup || isSubmittingRedeem;
+            btn.onclick = () => handleRedeem(nominal);
+            btn.innerHTML = `
+                <span class="voucher-nominal">${formatRupiah(nominal)}</span>
+                <span class="voucher-sub">${cukup ? "Tukar Kode 12 Digit" : "Saldo Kurang"}</span>
+            `;
+            grid.appendChild(btn);
+        });
+    }
+
+    function toggleSmsDrawer() {
+        const drawer = document.getElementById("smsDrawer");
+        drawer.classList.toggle("open");
+        if (drawer.classList.contains("open")) {
+            renderSmsCodes();
+        }
+    }
+
+    function switchSmsMode(mode) {
+        smsMode = mode === "NON_AKTIF" ? "NON_AKTIF" : "AKTIF";
+        document.getElementById("tabSmsAktif").classList.toggle("active", smsMode === "AKTIF");
+        document.getElementById("tabSmsNonAktif").classList.toggle("active", smsMode === "NON_AKTIF");
+        renderSmsCodes();
+    }
+
+    function changeSmsPage(nextPage) {
+        const sourceList = smsMode === "AKTIF" ? listAktif : listNonAktif;
+        const totalPages = Math.max(1, Math.ceil(sourceList.length / SMS_PER_PAGE));
+        const clamped = Math.min(Math.max(1, nextPage), totalPages);
+        if (smsMode === "AKTIF") {
+            smsPageAktif = clamped;
+        } else {
+            smsPageNonAktif = clamped;
+        }
+        renderSmsCodes();
+    }
+
+    function renderSmsCodes() {
+        document.getElementById("smsAktifCount").textContent = String(listAktif.length);
+
+        const listEl = document.getElementById("smsCodesList");
+        const pagEl = document.getElementById("smsPagination");
+        const sourceList = smsMode === "AKTIF" ? listAktif : listNonAktif;
+        const currentPage = smsMode === "AKTIF" ? smsPageAktif : smsPageNonAktif;
+
+        if (!sourceList.length) {
+            listEl.innerHTML = `<div class="empty-codes">Belum ada kode redeem berstatus ${smsMode === "AKTIF" ? "AKTIF" : "NON-AKTIF"}.</div>`;
+            pagEl.innerHTML = "";
+            return;
+        }
+
+        const totalPages = Math.max(1, Math.ceil(sourceList.length / SMS_PER_PAGE));
+        const safePage = Math.min(Math.max(1, currentPage), totalPages);
+        const startIdx = (safePage - 1) * SMS_PER_PAGE;
+        const pageItems = sourceList.slice(startIdx, startIdx + SMS_PER_PAGE);
+
+        listEl.innerHTML = pageItems.map((item) => {
+            const isAktif = String(item.status || "AKTIF").toUpperCase() === "AKTIF";
+            const badgeClass = isAktif ? "aktif" : "non-aktif";
+            const waktuInfo = isAktif
+                ? `Dibuat: ${escapeHtml(item.created_at || "-")}`
+                : `Dicairkan: ${escapeHtml(item.redeemed_at || item.created_at || "-")}`;
+
+            return `
+                <div class="code-item-card">
+                    <div>
+                        <div class="code-value">${escapeHtml(item.kode_redeem)}</div>
+                        <div class="code-meta">${waktuInfo}</div>
+                    </div>
+                    <div class="code-right">
+                        <span class="code-nominal">${formatRupiah(item.nominal)}</span>
+                        <span class="status-tag ${badgeClass}">${isAktif ? "AKTIF" : "NON-AKTIF"}</span>
+                        <button type="button" class="btn-copy-mini" onclick="copyTextValue('${escapeHtml(item.kode_redeem)}')">Salin</button>
+                    </div>
+                </div>
+            `;
+        }).join("");
+
+        if (totalPages <= 1) {
+            pagEl.innerHTML = "";
+            return;
+        }
+
+        let html = `<div class="pagination-bar">`;
+        html += `<button type="button" class="page-btn" ${safePage <= 1 ? "disabled" : ""} onclick="changeSmsPage(${safePage - 1})">‹</button>`;
+        for (let p = 1; p <= totalPages; p++) {
+            html += `<button type="button" class="page-btn ${p === safePage ? "active" : ""}" onclick="changeSmsPage(${p})">${p}</button>`;
+        }
+        html += `<button type="button" class="page-btn" ${safePage >= totalPages ? "disabled" : ""} onclick="changeSmsPage(${safePage + 1})">›</button>`;
+        html += `</div>`;
+        pagEl.innerHTML = html;
+    }
+
+    function copyTextValue(text) {
+        if (!text) return;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(() => alert("Kode disalin: " + text)).catch(() => {});
+        } else {
+            alert("Kode: " + text);
+        }
+    }
+
+    function openRedeemModal(kode, nominal) {
+        document.getElementById("modalKode12").textContent = kode;
+        document.getElementById("modalNominalInfo").textContent = "Nominal Cashout: " + formatRupiah(nominal);
+        document.getElementById("redeemModal").classList.add("show");
+    }
+
+    function closeRedeemModal() {
+        document.getElementById("redeemModal").classList.remove("show");
+    }
+
+    function copyModalKode() {
+        const kode = document.getElementById("modalKode12").textContent.trim();
+        if (kode && kode !== "-") {
+            copyTextValue(kode);
+        }
+    }
+
+    async function handleRedeem(nominal) {
+        if (isSubmittingRedeem || !currentUsername || currentSaldo < nominal) return;
+
+        const yakin = confirm(`Buat kode redeem 12 digit senilai ${formatRupiah(nominal)}? Saldo tabungan akan langsung terpotong.`);
+        if (!yakin) return;
+
+        isSubmittingRedeem = true;
+        renderVouchers();
+
+        try {
+            const res = await fetch("create_redeem.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    username: currentUsername,
+                    id_user: currentIdUser,
+                    nominal: nominal
+                })
+            });
+            const data = await res.json();
+
+            if (res.ok && data.status === "success") {
+                currentSaldo = Number(data.saldo_baru ?? (currentSaldo - nominal));
+                document.getElementById("redeemSaldo").textContent = formatRupiah(currentSaldo);
+                renderVouchers();
+
+                listAktif.unshift({
+                    kode_redeem: data.kode_redeem,
+                    nominal: Number(data.nominal || nominal),
+                    status: "AKTIF",
+                    created_at: data.created_at || new Date().toISOString(),
+                    redeemed_at: null
+                });
+                smsPageAktif = 1;
+                renderSmsCodes();
+                openRedeemModal(data.kode_redeem, data.nominal || nominal);
+            } else {
+                alert(data.message || "Gagal membuat kode redeem.");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Terjadi kesalahan koneksi saat membuat kode redeem.");
+        } finally {
+            isSubmittingRedeem = false;
+            renderVouchers();
+        }
+    }
+
+    async function initRedeemPage() {
+        currentUsername = resolveNasabahUser();
+        if (!currentUsername) {
+            clearRedeemSessionKeys();
+            redirectRedeemTo("login.html");
+            return;
+        }
+
+        try {
+            const res = await fetch(`get_redeem_codes.php?username=${encodeURIComponent(currentUsername)}&_t=${Date.now()}`);
+            const rawText = await res.text();
+            let data = null;
+            try {
+                data = JSON.parse(rawText);
+            } catch (e) {
+                data = null;
+            }
+
+            if (res.status === 401 || (data && /sesi login tidak ditemukan/i.test(String(data.message || "")))) {
+                clearRedeemSessionKeys();
+                redirectRedeemTo("login.html");
+                return;
+            }
+
+            if (!res.ok || !data || data.status !== "success" || !data.user) {
+                const errMsg = (data && data.message) ? data.message : "Gagal memuat data redeem dari server.";
+                document.getElementById("smsCodesList").innerHTML = `<div class="empty-codes">${escapeHtml(errMsg)}</div>`;
+                alert(errMsg);
+                return;
+            }
+
+            currentIdUser = String(data.user.id_user);
+            currentSaldo = Number(data.user.saldo || 0);
+            listAktif = Array.isArray(data.aktif) ? data.aktif : [];
+            listNonAktif = Array.isArray(data.non_aktif) ? data.non_aktif : [];
+            smsPageAktif = 1;
+            smsPageNonAktif = 1;
+
+            localStorage.setItem("nasabahLoggedUser", currentUsername);
+            sessionStorage.setItem("nasabahLoggedUser", currentUsername);
+
+            document.getElementById("redeemUserId").textContent = currentIdUser;
+            document.getElementById("redeemSaldo").textContent = formatRupiah(currentSaldo);
+            document.getElementById("linkBackDashboard").href = "dashboard.html";
+
+            renderVouchers();
+            renderSmsCodes();
+        } catch (err) {
+            console.error(err);
+            document.getElementById("smsCodesList").innerHTML = `<div class="empty-codes">Gagal terhubung ke server redeem.</div>`;
+            alert("Gagal memuat halaman redeem.");
+        }
+    }
+
+    initRedeemPage();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Bank Sampah Digital</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f4f7f4;
+            --surface: #ffffff;
+            --primary: #4a7c59;
+            --primary-hover: #3b6346;
+            --primary-light: #eaf2eb;
+            --accent: #88b04b;
+            --text-dark: #2c3e35;
+            --text-muted: #6c8075;
+            --border: #e1e8e3;
+            --radius: 20px;
+            --shadow: 0 15px 35px rgba(74, 124, 89, 0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before, body::after {
+            content: '';
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            background-repeat: no-repeat;
+            background-size: contain;
+            opacity: 0.04;
+            z-index: -1;
+            pointer-events: none;
+        }
+        body::before {
+            top: -50px; right: -50px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234a7c59'%3E%3Cpath d='M17,8C8,10 5.9,16.17 3.82,21.34L5.71,22L6.66,19.7C7.14,19.87 7.64,20 8,20C19,20 22,3 22,3C21,5 14,5.25 9,6.25C4,7.25 2,11.5 2,13.5C2,15.5 3.5,17 5,17C6.5,17 8,15.5 8,13.5C8,12 7,10 5,9C9,8 13,8 17,8Z'/%3E%3C/svg%3E");
+            transform: rotate(45deg) scale(1.5);
+        }
+        body::after {
+            bottom: -50px; left: -50px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234a7c59'%3E%3Cpath d='M17,8C8,10 5.9,16.17 3.82,21.34L5.71,22L6.66,19.7C7.14,19.87 7.64,20 8,20C19,20 22,3 22,3C21,5 14,5.25 9,6.25C4,7.25 2,11.5 2,13.5C2,15.5 3.5,17 5,17C6.5,17 8,15.5 8,13.5C8,12 7,10 5,9C9,8 13,8 17,8Z'/%3E%3C/svg%3E");
+            transform: rotate(-135deg) scale(1.8);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, var(--surface) 0%, var(--primary-light) 100%);
+            padding: 24px 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 6px; height: 100%;
+            background: var(--primary);
+        }
+
+        .user-info h2 { font-size: 1.5rem; color: var(--text-dark); font-weight: 800; }
+        .user-info p { font-size: 0.9rem; color: var(--text-muted); margin-top: 4px; }
+        
+        .badge-role {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-left: 6px;
+        }
+
+        .btn-logout {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(185, 28, 28, 0.1);
+        }
+        .btn-logout:hover { background: #fecaca; transform: translateY(-2px); }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .action-boxes-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid, .action-boxes-row { grid-template-columns: 1fr; }
+            header { flex-direction: column; align-items: flex-start; gap: 15px; }
+        }
+
+        .card {
+            background: var(--surface);
+            padding: 28px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(74, 124, 89, 0.12);
+        }
+
+        .card-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .card h3 {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 700;
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+            background: var(--primary-light);
+            width: 45px; height: 45px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 12px;
+            flex-shrink: 0;
+        }
+
+        .saldo-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+
+        .card p.desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .overview-box-btn {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+            background: var(--surface);
+            padding: 20px 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            color: var(--text-dark);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        }
+
+        .overview-box-btn:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(74, 124, 89, 0.12);
+        }
+
+        .overview-box-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .overview-box-title {
+            font-size: 1.02rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .overview-box-sub {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        .overview-box-action {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 8px 12px;
+            border-radius: 12px;
+            white-space: nowrap;
+        }
+
+        .history-card {
+            background: var(--surface);
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .history-card h3 {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .history-count-badge {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 5px 12px;
+            border-radius: 999px;
+        }
+
+        .empty-history {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            text-align: center;
+            padding: 30px 0;
+            background: #fafcfb;
+            border-radius: 14px;
+            border: 1.5px dashed var(--border);
+        }
+
+        .trx-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .trx-item {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: #fafcfb;
+            overflow: hidden;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .trx-item.open {
+            border-color: var(--primary);
+            box-shadow: 0 8px 20px rgba(74, 124, 89, 0.08);
+        }
+
+        .trx-summary-btn {
+            width: 100%;
+            background: var(--surface);
+            border: none;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            text-align: left;
+            color: var(--text-dark);
+            transition: background-color 0.2s ease;
+        }
+
+        .trx-summary-btn:hover {
+            background: var(--primary-light);
+        }
+
+        .trx-left .trx-title {
+            font-weight: 800;
+            font-size: 0.98rem;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .trx-code-pill {
+            display: inline-block;
+            background: var(--primary-light);
+            color: var(--primary);
+            border: 1px solid #cce0d1;
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+        }
+
+        .trx-code-pill.expense {
+            background: #fee2e2;
+            color: #b91c1c;
+            border-color: #fecaca;
+        }
+
+        .trx-left .trx-date {
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-top: 4px;
+        }
+
+        .trx-left .trx-hint {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .trx-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .trx-totals {
+            text-align: right;
+        }
+
+        .trx-totals .uang {
+            font-weight: 800;
+            font-size: 1.05rem;
+            color: var(--primary);
+        }
+
+        .trx-totals .uang.expense {
+            color: #dc2626;
+        }
+
+        .trx-totals .berat {
+            font-size: 0.83rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .trx-arrow {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            transition: transform 0.25s ease;
+        }
+
+        .trx-item.open .trx-arrow {
+            transform: rotate(180deg);
+            color: var(--primary);
+        }
+
+        .trx-detail-panel {
+            display: none;
+            padding: 6px 20px 18px;
+            background: #f8fbf8;
+            border-top: 1px solid var(--border);
+        }
+
+        .trx-item.open .trx-detail-panel {
+            display: block;
+        }
+
+        .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            font-size: 0.88rem;
+        }
+
+        .detail-table th {
+            text-align: left;
+            padding: 8px 6px;
+            font-size: 0.76rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .detail-table td {
+            padding: 10px 6px;
+            border-bottom: 1px dashed #e3eae5;
+            color: var(--text-dark);
+        }
+
+        .detail-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .item-subdate {
+            display: block;
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .text-right {
+            text-align: right !important;
+        }
+
+        .subtotal-expense {
+            color: #dc2626;
+            font-weight: 800;
+        }
+
+        .pagination-wrapper {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .pagination-info {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .page-btn {
+            min-width: 34px;
+            height: 34px;
+            padding: 0 9px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-dark);
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .page-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #ffffff;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .page-range-tag {
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 4px 9px;
+            border-radius: 8px;
+            margin-left: 4px;
+        }
+
+        footer {
+            margin-top: 40px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="user-info">
+            <h2 id="welcomeNama">Halo, Memuat...</h2>
+            <p>ID Anggota: <span id="userId" style="font-weight: 600; color: var(--text-dark);">-</span> <span class="badge-role" id="userRole">NASABAH</span></p>
+        </div>
+        <button type="button" class="btn-logout" onclick="logoutActiveSession()">Keluar 🚪</button>
+    </header>
+
+    <div class="dashboard-grid">
+        <div class="card">
+            <div class="card-header-flex">
+                <h3>Total Saldo Tabungan</h3>
+                <div class="card-icon">💳</div>
+            </div>
+            <div class="saldo-value" id="userSaldo">Rp 0</div>
+            <p class="desc">Akumulasi hasil konversi setoran sampah Anda.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-header-flex">
+                <h3>Status Akun</h3>
+                <div class="card-icon">🌱</div>
+            </div>
+            <div style="font-size: 1.3rem; font-weight: 800; color: var(--primary); margin-top: 6px; margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+                <span style="width: 12px; height: 12px; background: #22c55e; border-radius: 50%; display: inline-block; box-shadow: 0 0 10px #22c55e;"></span> Aktif
+            </div>
+            <p class="desc">Siap digunakan untuk mulai menabung.</p>
+        </div>
+    </div>
+
+    <div class="action-boxes-row">
+        <a href="overview.html" id="btnBukaOverview" class="overview-box-btn">
+            <div class="overview-box-left">
+                <div class="card-icon">📊</div>
+                <div>
+                    <div class="overview-box-title">Overview Setoran Sampah</div>
+                    <div class="overview-box-sub">Rekap 3 hari, 7 hari, sebulan, &amp; lifetime.</div>
+                </div>
+            </div>
+            <div class="overview-box-action">Buka →</div>
+        </a>
+
+        <a href="redeem.html" id="btnBukaRedeem" class="overview-box-btn">
+            <div class="overview-box-left">
+                <div class="card-icon">🎟️</div>
+                <div>
+                    <div class="overview-box-title">Redeem Code</div>
+                    <div class="overview-box-sub">Tukar saldo jadi kode cashout 12 digit &amp; SMS kode.</div>
+                </div>
+            </div>
+            <div class="overview-box-action">Redeem →</div>
+        </a>
+    </div>
+
+    <div class="history-card" id="historySection">
+        <div class="history-header">
+            <h3><span>📜</span> Riwayat Setoran Sampah Terakhir</h3>
+            <span class="history-count-badge" id="totalRiwayatBadge" style="display: none;">0 Transaksi</span>
+        </div>
+        <div id="riwayatContainer">
+            <div class="empty-history">Belum ada riwayat setoran sampah tercatat di sistem.</div>
+        </div>
+        <div id="riwayatPagination"></div>
+    </div>
+</div>
+
+<footer>
+    " The Earth is what we all have in common. " - Wendbell Berry
+</footer>
+
+<script>
+    let redirectingTarget = '';
+
+    function getGlobalActiveSession() {
+        const user = (
+            localStorage.getItem('activeSessionUser') ||
+            localStorage.getItem('loggedUser') ||
+            ''
+        ).trim();
+        const role = (
+            localStorage.getItem('activeSessionRole') ||
+            localStorage.getItem('loggedRole') ||
+            'NASABAH'
+        ).trim().toUpperCase();
+        return { user, role };
+    }
+
+    function redirectToPage(target) {
+        if (redirectingTarget === target) return;
+        redirectingTarget = target;
+        window.location.replace(target);
+    }
+
+    function clearAllSessionStorage() {
+        localStorage.removeItem('activeSessionUser');
+        localStorage.removeItem('activeSessionRole');
+        localStorage.removeItem('loggedUser');
+        localStorage.removeItem('loggedRole');
+        localStorage.removeItem('nasabahLoggedUser');
+        localStorage.removeItem('adminLoggedUser');
+
+        sessionStorage.removeItem('activeSessionUser');
+        sessionStorage.removeItem('activeSessionRole');
+        sessionStorage.removeItem('loggedUser');
+        sessionStorage.removeItem('loggedRole');
+        sessionStorage.removeItem('nasabahLoggedUser');
+        sessionStorage.removeItem('adminLoggedUser');
+    }
+
+    function logoutActiveSession() {
+        clearAllSessionStorage();
+        redirectToPage('login.html');
+    }
+
+    function syncSessionWithOtherTabs() {
+        const { user, role } = getGlobalActiveSession();
+        if (!user) {
+            clearAllSessionStorage();
+            redirectToPage('login.html');
+            return false;
+        }
+        if (role === 'ADMIN') {
+            redirectToPage('admin_dashboard.html');
+            return false;
+        }
+        if (currentUsername && user !== currentUsername) {
+            window.location.reload();
+            return false;
+        }
+        return true;
+    }
+
+    window.addEventListener('storage', function(e) {
+        if (
+            e.key === 'activeSessionUser' ||
+            e.key === 'loggedUser' ||
+            e.key === 'activeSessionRole' ||
+            e.key === 'loggedRole' ||
+            e.key === 'adminLoggedUser' ||
+            e.key === 'nasabahLoggedUser'
+        ) {
+            syncSessionWithOtherTabs();
+        }
+    });
+
+    window.addEventListener('focus', function() {
+        syncSessionWithOtherTabs();
+    });
+
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            syncSessionWithOtherTabs();
+        }
+    });
+
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            redirectingTarget = '';
+        }
+        if (syncSessionWithOtherTabs() && event.persisted) {
+            loadUserData();
+        }
+    });
+
+    const initialSession = getGlobalActiveSession();
+    const currentUsername = initialSession.user;
+
+    if (!currentUsername) {
+        clearAllSessionStorage();
+        redirectToPage('login.html');
+    } else if (initialSession.role === 'ADMIN') {
+        redirectToPage('admin_dashboard.html');
+    }
+
+    const ITEMS_PER_PAGE = 10;
+    const PAGE_WINDOW_SIZE = 10;
+    let allRiwayatList = [];
+    let currentPage = 1;
+
+    function formatRupiah(amount) {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            maximumFractionDigits: 0
+        }).format(Number(amount || 0));
+    }
+
+    function formatBerat(kg) {
+        const val = parseFloat(kg || 0);
+        const clean = Number.isInteger(val) ? val : val.toFixed(2).replace(/\.?0+$/, '');
+        return `${clean} Kg`;
+    }
+
+    function formatTanggal(rawDate) {
+        if (!rawDate) return 'Tanggal tidak tersedia';
+        const d = new Date(String(rawDate).replace(' ', 'T'));
+        if (isNaN(d.getTime())) return rawDate;
+        return d.toLocaleDateString('id-ID', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    function toggleTrxDropdown(index) {
+        const el = document.getElementById(`trx_item_${index}`);
+        if (el) {
+            el.classList.toggle('open');
+        }
+    }
+
+    function goToPage(page, shouldScroll = true) {
+        const totalPages = Math.max(1, Math.ceil(allRiwayatList.length / ITEMS_PER_PAGE));
+        currentPage = Math.min(Math.max(1, page), totalPages);
+        renderRiwayatPage();
+
+        if (shouldScroll) {
+            const section = document.getElementById('historySection');
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+    }
+
+    function renderPaginationControls(totalItems, totalPages, startIdx, endIdx) {
+        const paginationEl = document.getElementById('riwayatPagination');
+        if (!paginationEl) return;
+
+        if (totalItems <= ITEMS_PER_PAGE) {
+            paginationEl.innerHTML = '';
+            return;
+        }
+
+        const windowIndex = Math.floor((currentPage - 1) / PAGE_WINDOW_SIZE);
+        const windowStart = windowIndex * PAGE_WINDOW_SIZE + 1;
+        const windowEnd = Math.min(totalPages, windowStart + PAGE_WINDOW_SIZE - 1);
+
+        let pageNumbersHtml = '';
+        for (let p = windowStart; p <= windowEnd; p++) {
+            const activeClass = p === currentPage ? 'active' : '';
+            pageNumbersHtml += `<button type="button" class="page-btn ${activeClass}" onclick="goToPage(${p})">${p}</button>`;
+        }
+
+        const isFirst = currentPage === 1;
+        const isLast = currentPage === totalPages;
+
+        paginationEl.innerHTML = `
+            <div class="pagination-wrapper">
+                <div class="pagination-info">
+                    Menampilkan <strong>${startIdx + 1}–${endIdx}</strong> dari <strong>${totalItems}</strong> riwayat
+                    <span class="page-range-tag">Halaman ${windowStart}–${windowEnd} / ${totalPages}</span>
+                </div>
+                <div class="pagination-controls">
+                    <button type="button" class="page-btn" title="Mentok Kiri (Halaman 1)" ${isFirst ? 'disabled' : ''} onclick="goToPage(1)">«</button>
+                    <button type="button" class="page-btn" title="Halaman Sebelumnya" ${isFirst ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})">‹</button>
+                    ${pageNumbersHtml}
+                    <button type="button" class="page-btn" title="Halaman Berikutnya" ${isLast ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})">›</button>
+                    <button type="button" class="page-btn" title="Mentok Kanan (Halaman ${totalPages})" ${isLast ? 'disabled' : ''} onclick="goToPage(${totalPages})">»</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderRiwayatPage() {
+        const container = document.getElementById('riwayatContainer');
+        const paginationEl = document.getElementById('riwayatPagination');
+        const badgeEl = document.getElementById('totalRiwayatBadge');
+
+        if (!Array.isArray(allRiwayatList) || allRiwayatList.length === 0) {
+            container.innerHTML = `<div class="empty-history">Belum ada riwayat setoran sampah tercatat di sistem.</div>`;
+            if (paginationEl) paginationEl.innerHTML = '';
+            if (badgeEl) badgeEl.style.display = 'none';
+            return;
+        }
+
+        const totalItems = allRiwayatList.length;
+        const totalPages = Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
+        if (currentPage > totalPages) currentPage = totalPages;
+
+        if (badgeEl) {
+            badgeEl.textContent = `${totalItems} Transaksi`;
+            badgeEl.style.display = 'inline-block';
+        }
+
+        const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
+        const endIdx = Math.min(totalItems, startIdx + ITEMS_PER_PAGE);
+        const pageSlice = allRiwayatList.slice(startIdx, endIdx);
+
+        let html = `<div class="trx-list">`;
+
+        pageSlice.forEach((sesi, idx) => {
+            const globalIdx = startIdx + idx;
+            const items = Array.isArray(sesi.items) ? sesi.items : [];
+            const kodeTrx = sesi.kode_transaksi || sesi.kode_sesi || 'TRX';
+            const isExpense = Boolean(sesi.is_expense) || Number(sesi.total_uang || 0) < 0;
+            const absUang = Math.abs(Number(sesi.total_uang || 0));
+            const uangText = isExpense ? `-${formatRupiah(absUang)}` : `+${formatRupiah(absUang)}`;
+            const uangClass = isExpense ? 'uang expense' : 'uang';
+            const pillClass = isExpense ? 'trx-code-pill expense' : 'trx-code-pill';
+
+            const totalBarang = sesi.total_barang ?? items.reduce((acc, i) => acc + (parseInt(i.jumlah_barang, 10) || 0), 0);
+
+            const ringkasanBaris = isExpense
+                ? `Pengeluaran Redeem Cashout • Kode 12 Digit`
+                : `${items.length} Jenis Sampah (${totalBarang} pcs)`;
+
+            const kananBawah = isExpense
+                ? `Pengeluaran Saldo`
+                : `Total Kg: ${formatBerat(sesi.total_berat)}`;
+
+            const detailRows = items.map(item => {
+                const itemExpense = Boolean(item.is_expense) || Number(item.total_harga || 0) < 0;
+                const itemAbsUang = Math.abs(Number(item.total_harga || 0));
+                const itemUangFormatted = itemExpense
+                    ? `<span class="subtotal-expense">-${formatRupiah(itemAbsUang)}</span>`
+                    : `<strong>${formatRupiah(itemAbsUang)}</strong>`;
+
+                const specText = itemExpense
+                    ? `Tanggal: ${formatTanggal(item.waktu || sesi.waktu)} • Kode Redeem: ${kodeTrx}`
+                    : `Tanggal: ${formatTanggal(item.waktu || sesi.waktu)} • ${formatRupiah(item.harga_per_kg)}/Kg`;
+
+                const jmlCol = itemExpense ? `-` : `${parseInt(item.jumlah_barang, 10) || 1} pcs`;
+                const kgCol = itemExpense ? `-` : `${formatBerat(item.berat_kg)}`;
+
+                return `
+                    <tr>
+                        <td>
+                            <strong>${item.nama_jenis}</strong>
+                            <span class="item-subdate">${specText}</span>
+                        </td>
+                        <td class="text-right">${jmlCol}</td>
+                        <td class="text-right">${kgCol}</td>
+                        <td class="text-right">${itemUangFormatted}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            html += `
+                <div class="trx-item" id="trx_item_${globalIdx}">
+                    <button type="button" class="trx-summary-btn" onclick="toggleTrxDropdown(${globalIdx})">
+                        <div class="trx-left">
+                            <div class="trx-title">
+                                <span class="${pillClass}">${isExpense ? 'RDM' : 'TRX'} #${kodeTrx}</span>
+                                <span>• ${ringkasanBaris}</span>
+                            </div>
+                            <div class="trx-date">📅 ${formatTanggal(sesi.waktu)}</div>
+                            <div class="trx-hint">Klik untuk lihat detail</div>
+                        </div>
+                        <div class="trx-right">
+                            <div class="trx-totals">
+                                <div class="${uangClass}">${uangText}</div>
+                                <div class="berat">${kananBawah}</div>
+                            </div>
+                            <span class="trx-arrow">▼</span>
+                        </div>
+                    </button>
+                    <div class="trx-detail-panel">
+                        <table class="detail-table">
+                            <thead>
+                                <tr>
+                                    <th>Keterangan / Jenis Sampah</th>
+                                    <th class="text-right">Jumlah Barang</th>
+                                    <th class="text-right">Total Kg</th>
+                                    <th class="text-right">Nominal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${detailRows}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+        container.innerHTML = html;
+
+        renderPaginationControls(totalItems, totalPages, startIdx, endIdx);
+    }
+
+    async function loadRiwayatSetoran(idUser) {
+        if (!idUser) {
+            allRiwayatList = [];
+            renderRiwayatPage();
+            return;
+        }
+
+        try {
+            const res = await fetch(`/get_riwayat.php?id_user=${encodeURIComponent(idUser)}&_t=${Date.now()}`);
+            const data = await res.json();
+
+            if (data.status === 'success' && Array.isArray(data.riwayat)) {
+                allRiwayatList = data.riwayat;
+            } else {
+                allRiwayatList = [];
+            }
+            currentPage = 1;
+            renderRiwayatPage();
+        } catch (err) {
+            console.error("Gagal memuat riwayat setoran:", err);
+            allRiwayatList = [];
+            renderRiwayatPage();
+        }
+    }
+
+    async function loadUserData() {
+        if (!currentUsername) return;
+        try {
+            const res = await fetch(`/get_user.php?username=${encodeURIComponent(currentUsername)}`);
+            const data = await res.json();
+
+            if (data.status === 'success' && data.user) {
+                const role = String(data.user.role || 'NASABAH').toUpperCase();
+                if (role === 'ADMIN') {
+                    localStorage.setItem('activeSessionUser', currentUsername);
+                    localStorage.setItem('activeSessionRole', 'ADMIN');
+                    localStorage.setItem('loggedUser', currentUsername);
+                    localStorage.setItem('loggedRole', 'ADMIN');
+                    redirectToPage('admin_dashboard.html');
+                    return;
+                }
+
+                localStorage.setItem('activeSessionUser', currentUsername);
+                localStorage.setItem('activeSessionRole', 'NASABAH');
+                localStorage.setItem('loggedUser', currentUsername);
+                localStorage.setItem('loggedRole', 'NASABAH');
+
+                document.getElementById('welcomeNama').textContent = `Halo, ${data.user.nama}`;
+                document.getElementById('userRole').textContent = data.user.role;
+                document.getElementById('userId').textContent = data.user.id_user;
+                document.getElementById('userSaldo').textContent = formatRupiah(data.user.saldo);
+
+                if (data.user.id_user) {
+                    const btnOverview = document.getElementById('btnBukaOverview');
+                    if (btnOverview) {
+                        btnOverview.href = `overview.html?id_user=${encodeURIComponent(data.user.id_user)}`;
+                    }
+                }
+
+                await loadRiwayatSetoran(data.user.id_user);
+            } else {
+                alert("Sesi tidak valid.");
+                logoutActiveSession();
+            }
+        } catch (err) {
+            console.error("Gagal memuat data user:", err);
+        }
+    }
+
+    if (currentUsername && initialSession.role !== 'ADMIN') {
+        loadUserData();
+    }
+</script>
+
+</body>
+</html>
