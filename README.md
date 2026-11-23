@@ -138,4 +138,4 @@ INSERT IGNORE INTO `users` (`id_user`, `username`, `password`, `nama`, `role`, `
   - **Password:** `1`
 
 ## Tautan Live Demo
-**103.193.176.72**
+**http://103.193.176.72**
